@@ -23,11 +23,13 @@ services:
       - backend.env
     environment:
       - DASHBOARD_URL=http://localhost:9000/
-      - ALLOWED_HOSTS=localhost,api
+      - ALLOWED_HOSTS=host.docker.internal,localhost,api
+      - PUBLIC_URL=http://host.docker.internal:8000/
     healthcheck:
       test: 
         - "CMD-SHELL"
         - "-c"
+        - "python"
         - "import http.client; conn = http.client.HTTPConnection('localhost', 8000); try: conn.request('GET', '/graphql/'); res = conn.getresponse(); exit(0) if res.status == 200 else exit(1); except: exit(1)"
       interval: 5s
       timeout: 5s
@@ -35,7 +37,7 @@ services:
       start_period: 10s # Give the service some time to start up before checking
 
 
-  frontend:
+  storefront:
     build:
       context: ./Storefront
       dockerfile: Dockerfile
@@ -45,9 +47,11 @@ services:
       - ./Storefront:/app
       # 2. Named volume for node_modules
       - node_modules_store:/app/node_modules  
-      - /app/.next
+      - next_compile_folder:/app/.next
     image: storefront_img
     container_name: storefront
+    networks:
+      - saleor-backend-tier
     ports: 
       - "3000:3000"
     depends_on:
@@ -55,7 +59,6 @@ services:
         condition: service_healthy 
     environment:
       - NEXT_PUBLIC_SALEOR_API_URL=http://api:8000/graphql/
-      - SALEOR_API_INTERNAL_URL=http://api:8000/graphql/
       - NEXT_PUBLIC_STOREFRONT_URL=http://localhost:3000
       - SALEOR_APP_TOKEN=
 
@@ -138,6 +141,24 @@ services:
     networks:
       - saleor-backend-tier
 
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+  #  restart: unless-stopped
+    networks:
+      - saleor-backend-tier
+    ports:
+      - "5050:80"
+    depends_on:
+      db:
+        condition: service_healthy 
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=eric@coteexpert.com
+      - PGADMIN_DEFAULT_PASSWORD=af123123123
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin 
+      - ./servers.json:/pgadmin4/servers.json
+
 volumes:
   saleor-db:
     driver: local
@@ -145,6 +166,8 @@ volumes:
     driver: local
   saleor-media:
   node_modules_store:
+  next_compile_folder:
+  pgadmin-data:
 
 networks:
   saleor-backend-tier:

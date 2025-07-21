@@ -1,0 +1,14 @@
+{
+  "Servers": {
+    "SaleorDB": {
+      "Name": "SaleorDB",
+      "Group": "Servers",
+      "Host": "db",
+      "Port": 5432,
+      "Username": "saleor",
+      "Password": "saleor",
+      "MaintenanceDB": "saleor",
+      "SSLMode": "allow"
+    }
+  }
+}
