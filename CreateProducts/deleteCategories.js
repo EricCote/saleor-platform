@@ -1,0 +1,64 @@
+import { executeGraphQL } from './graphql.js';
+import 'dotenv/config';
+import {
+  fetchProductType,
+  fetchAllCategories,
+  fetchChannel,
+  fetchWarehouse,
+  fetchAllCollections,
+  fetchAllProducts,
+} from './fetchers.js';
+
+const collections = await fetchAllCollections();
+
+const categories = await fetchAllCategories();
+
+const response = await deleteCollections(collections);
+console.log(response);
+
+const response2 = await deleteCategories(categories);
+console.log(response2);
+
+async function deleteCollections(collections) {
+  const collectionList = collections.map((c) => c.id);
+
+  const query = `
+      mutation DeleteBulkCollection($ids: [ID!]!) {
+        collectionBulkDelete(ids: $ids) {
+          count
+          errors {
+            field
+            message
+            code
+          }
+        }  
+      }
+    `;
+
+  const variables = { ids: collectionList };
+  const response = await executeGraphQL(query, { variables });
+
+  return response;
+}
+
+async function deleteCategories(categories) {
+  const categoryList = categories.map((c) => c.id);
+
+  const query = `
+      mutation DeleteBulkCategory($ids: [ID!]!) {
+        categoryBulkDelete(ids: $ids) {
+          count
+          errors {
+            field
+            message
+            code
+          }
+        }  
+      }
+    `;
+
+  const variables = { ids: categoryList };
+  const response = await executeGraphQL(query, { variables });
+
+  return response;
+}
