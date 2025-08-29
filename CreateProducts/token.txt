@@ -1,0 +1,2 @@
+Authorization: Bearer token123
+Authorization-Bearer: token123

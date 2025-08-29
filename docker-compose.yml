@@ -67,7 +67,9 @@ services:
     ports:
       - 9000:80
     restart: unless-stopped
- 
+    env_file:
+      - common.env
+
   db:
     image: library/postgres:alpine
     ports:
