@@ -1,6 +1,6 @@
 services:
   api:
-    image: ghcr.io/saleor/saleor:3.21
+    image: ghcr.io/saleor/saleor:latest
     ports:
       - 8000:8000
     restart: unless-stopped
@@ -9,9 +9,12 @@ services:
     stdin_open: true
     tty: true
     depends_on:
-      - db
-      - redis
-      - jaeger
+      redis:
+        condition: service_started
+      jaeger:
+        condition: service_started
+      db:
+        condition: service_healthy 
     volumes:
       # shared volume between worker and api for media
       - saleor-media:/app/media
@@ -20,16 +23,53 @@ services:
       - backend.env
     environment:
       - DASHBOARD_URL=http://localhost:9000/
-      - ALLOWED_HOSTS=localhost,api
+      - ALLOWED_HOSTS=host.docker.internal,localhost,api
+      - PUBLIC_URL=http://host.docker.internal:8000/
+    healthcheck:
+      test: 
+        - "CMD-SHELL"
+        - "-c"
+        - "python"
+        - "import http.client; conn = http.client.HTTPConnection('localhost', 8000); try: conn.request('GET', '/graphql/'); res = conn.getresponse(); exit(0) if res.status == 200 else exit(1); except: exit(1)"
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s # Give the service some time to start up before checking
+
+
+  storefront:
+    build:
+      context: ./storefront
+      dockerfile: Dockerfile
+    volumes:
+      # 1. Bind mount your application code
+      # This keeps your code in sync with your host for development
+      - ./storefront:/app
+      # 2. Named volume for node_modules
+      - node_modules_store:/app/node_modules  
+      - next_compile_folder:/app/.next
+    image: storefront_img
+    container_name: storefront
+    networks:
+      - saleor-backend-tier
+    ports: 
+      - "3000:3000"
+    depends_on:
+      api: 
+        condition: service_healthy 
+    environment:
+      - NEXT_PUBLIC_SALEOR_API_URL=http://api:8000/graphql/
+      - NEXT_PUBLIC_STOREFRONT_URL=http://localhost:3000
+      - SALEOR_APP_TOKEN=
 
   dashboard:
     image: ghcr.io/saleor/saleor-dashboard:latest
     ports:
       - 9000:80
     restart: unless-stopped
-
+ 
   db:
-    image: library/postgres:15-alpine
+    image: library/postgres:alpine
     ports:
       - 5432:5432
     restart: unless-stopped
@@ -38,12 +78,21 @@ services:
     volumes:
       - saleor-db:/var/lib/postgresql/data
       - ./replica_user.sql:/docker-entrypoint-initdb.d/replica_user.sql:ro,z
+    secrets:
+      - postgres_password
     environment:
-      - POSTGRES_USER=saleor
-      - POSTGRES_PASSWORD=saleor
+      POSTGRES_USER: SaleorUser      
+      POSTGRES_DB: saleor
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    healthcheck:
+      # test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U SaleorUser -d saleor"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   redis:
-    image: library/redis:7.0-alpine
+    image: library/redis:alpine
     ports:
       - 6379:6379
     restart: unless-stopped
@@ -52,9 +101,12 @@ services:
     volumes:
       - saleor-redis:/data
 
+
+#Scheduler:  https://docs.saleor.io/developer/running-saleor/task-queue
+#command: celery -A saleor -B
   worker:
-    image: ghcr.io/saleor/saleor:3.21
-    command: celery -A saleor --app=saleor.celeryconf:app worker --loglevel=info -B
+    image: ghcr.io/saleor/saleor:latest
+    command: celery --app=saleor.celeryconf:app worker -E --loglevel=info 
     restart: unless-stopped
     networks:
       - saleor-backend-tier
@@ -68,6 +120,8 @@ services:
       # shared volume between worker and api for media
       - saleor-media:/app/media
 
+
+#Tracer 
   jaeger:
     image: jaegertracing/jaeger
     ports:
@@ -81,6 +135,7 @@ services:
       - type: tmpfs
         target: /tmp
 
+#Mail config
   mailpit:
     image: axllent/mailpit
     ports:
@@ -90,13 +145,42 @@ services:
     networks:
       - saleor-backend-tier
 
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: unless-stopped
+    networks:
+      - saleor-backend-tier
+    ports:
+      - "5050:80"
+    depends_on:
+      db:
+        condition: service_healthy 
+    secrets:
+      - pgadmin_default_password
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@ecomzen.ca
+      PGADMIN_DEFAULT_PASSWORD_FILE: /run/secrets/pgadmin_default_password
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin 
+      - ./servers.json:/pgadmin4/servers.json
+
 volumes:
   saleor-db:
     driver: local
   saleor-redis:
     driver: local
   saleor-media:
+  node_modules_store:
+  next_compile_folder:
+  pgadmin-data:
 
 networks:
   saleor-backend-tier:
     driver: bridge
+
+secrets:
+  pgadmin_default_password:
+    file: secrets/pgadmin_default_password.txt
+  postgres_password:
+    file: secrets/postgres_password.txt
