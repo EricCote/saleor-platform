@@ -1,1 +1,17 @@
+
+
+*.env
+
+/.pnp
+.pnp.js
+/secrets
+# next.js
+/.next/
+/out/
+# production
+/build
+
+
 .idea
+node_modules/ 
+.DS_Store
