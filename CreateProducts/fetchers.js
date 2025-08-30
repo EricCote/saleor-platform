@@ -294,3 +294,58 @@ export async function fetchAllProducts() {
   }
   return allProducts;
 }
+
+export async function updateCollectionChannelListing(
+  collectionId,
+  channelId,
+  isPublished = true
+) {
+  const mutation = `mutation CollectionChannelListingUpdate($collectionId: ID!, $channelListings: CollectionChannelListingUpdateInput!) {
+  collectionChannelListingUpdate(id: $collectionId, input: $channelListings) {
+    collection {
+      id
+      name
+      slug
+      channelListings {
+        channel {
+          id
+          name
+          slug
+        }
+      }
+    }
+  }
+}
+`;
+  const variables = {
+    collectionId: collectionId,
+    channelListings: {
+      removeChannels: [],
+      addChannels: [
+        {
+          channelId: channelId,
+          isPublished: isPublished,
+        },
+      ],
+    },
+  };
+
+  try {
+    const data = await executeGraphQL(mutation, { variables });
+
+    const result = data.collectionChannelListingUpdate;
+    if (result.errors && result.errors.length > 0) {
+      console.error('Product Errors:', result.errors);
+      return null;
+    }
+
+    const collection = result.collection;
+    console.log(
+      `Successfully updated product channel listing for product: ${collection.name}`
+    );
+    return collection;
+  } catch (error) {
+    console.error('Failed to update collection channel listing:', error);
+    return null;
+  }
+}

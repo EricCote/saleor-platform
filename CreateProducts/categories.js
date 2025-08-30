@@ -3,7 +3,11 @@ import { executeGraphQL } from './graphql.js';
 import slug from 'slug';
 
 import 'dotenv/config';
-import { fetchCategories, fetchChannel } from './fetchers.js';
+import {
+  fetchCategories,
+  fetchChannel,
+  updateCollectionChannelListing,
+} from './fetchers.js';
 
 const sqlconn_string = process.env.sqlconn_string;
 
@@ -313,60 +317,5 @@ async function createCollections(categories) {
       console.error(`Error creating collection ${name}:`, error);
       throw error; // Stop on error to avoid overwhelming the server
     }
-  }
-}
-
-async function updateCollectionChannelListing(
-  collectionId,
-  channelId,
-  isPublished = true
-) {
-  const mutation = `mutation CollectionChannelListingUpdate($collectionId: ID!, $channelListings: CollectionChannelListingUpdateInput!) {
-  collectionChannelListingUpdate(id: $collectionId, input: $channelListings) {
-    collection {
-      id
-      name
-      slug
-      channelListings {
-        channel {
-          id
-          name
-          slug
-        }
-      }
-    }
-  }
-}
-`;
-  const variables = {
-    collectionId: collectionId,
-    channelListings: {
-      removeChannels: [],
-      addChannels: [
-        {
-          channelId: channelId,
-          isPublished: isPublished,
-        },
-      ],
-    },
-  };
-
-  try {
-    const data = await executeGraphQL(mutation, { variables });
-
-    const result = data.collectionChannelListingUpdate;
-    if (result.errors && result.errors.length > 0) {
-      console.error('Product Errors:', result.errors);
-      return null;
-    }
-
-    const collection = result.collection;
-    console.log(
-      `Successfully updated product channel listing for product: ${collection.name}`
-    );
-    return collection;
-  } catch (error) {
-    console.error('Failed to update collection channel listing:', error);
-    return null;
   }
 }
