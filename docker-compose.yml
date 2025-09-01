@@ -22,9 +22,9 @@ services:
       - common.env
       - backend.env
     environment:
-      - DASHBOARD_URL=http://localhost:9000/
-      - ALLOWED_HOSTS=host.docker.internal,localhost,api
-      - PUBLIC_URL=http://host.docker.internal:8000/
+      DASHBOARD_URL: ${DASHBOARD_URL}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS}
+      PUBLIC_URL: ${PUBLIC_URL}
     healthcheck:
       test: 
         - "CMD-SHELL"
@@ -53,22 +53,47 @@ services:
     networks:
       - saleor-backend-tier
     ports: 
-      - "3000:3000"
+      - "3009:3000"
     depends_on:
       api: 
         condition: service_healthy 
     environment:
-      - NEXT_PUBLIC_SALEOR_API_URL=http://api:8000/graphql/
-      - NEXT_PUBLIC_STOREFRONT_URL=http://localhost:3000
-      - SALEOR_APP_TOKEN=
+      NEXT_PUBLIC_SALEOR_API_URL: ${NEXT_PUBLIC_SALEOR_API_URL}
+      NEXT_PUBLIC_STOREFRONT_URL: ${NEXT_PUBLIC_STOREFRONT_URL}
+      SALEOR_APP_TOKEN: ${SALEOR_APP_TOKEN}
+      
+  storefront_prod:
+    build:
+      context: ./storefront
+      dockerfile: Dockerfile
+      target: runner       # use the production "runner" stage
+      args:
+        NEXT_PUBLIC_SALEOR_API_URL: ${NEXT_PUBLIC_SALEOR_API_URL}
+        NEXT_PUBLIC_STOREFRONT_URL: ${NEXT_PUBLIC_STOREFRONT_URL}
+    image: storefront_img_prod
+    container_name: storefront_prod
+    restart: unless-stopped
+    networks:
+      - saleor-backend-tier
+    ports:
+      - "3000:3000"        # maps container 3000 -> host 3001 to avoid conflicts with dev
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      NEXT_PUBLIC_SALEOR_API_URL: ${NEXT_PUBLIC_SALEOR_API_URL}
+      NEXT_PUBLIC_STOREFRONT_URL: ${NEXT_PUBLIC_STOREFRONT_URL}
+      SALEOR_APP_TOKEN: ${SALEOR_APP_TOKEN}
+    # NOTE: do NOT mount ./storefront here — that would override the built standalone output
+    # volumes: []
 
   dashboard:
     image: ghcr.io/saleor/saleor-dashboard:latest
     ports:
       - 9000:80
     restart: unless-stopped
-    env_file:
-      - common.env
+    environment:
+      API_URL: ${API_URL}
 
   db:
     image: library/postgres:alpine
@@ -83,12 +108,11 @@ services:
     secrets:
       - postgres_password
     environment:
-      POSTGRES_USER: SaleorUser      
-      POSTGRES_DB: saleor
+      POSTGRES_USER: ${POSTGRES_USER}      
+      POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
     healthcheck:
-      # test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      test: ["CMD-SHELL", "pg_isready -U SaleorUser -d saleor"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -161,7 +185,7 @@ services:
     secrets:
       - pgadmin_default_password
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@ecomzen.ca
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
       PGADMIN_DEFAULT_PASSWORD_FILE: /run/secrets/pgadmin_default_password
     volumes:
       - pgadmin-data:/var/lib/pgadmin 
