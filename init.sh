@@ -5,7 +5,11 @@ docker compose run --rm api python3 manage.py migrate
 #docker compose run --rm api python3 manage.py populatedb
 docker compose run --rm api python3 manage.py createsuperuser --no-input
 docker compose run --rm storefront sh -c "HUSKY=0 pnpm install"
+
+docker compose up api -d
+docker-compose build --no-cache storefront_prod
 docker compose up -d
+
 
 if [[ -v NVM_DIR ]]; then
   echo "NVM is installed.  No need to install node."
