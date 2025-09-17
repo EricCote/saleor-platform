@@ -1,0 +1,722 @@
+[
+  {
+    "prod": "fe12577",
+    "link": "fe12577-sterile-lubricating-jelly",
+    "newLink": "fe12577m-sterile-lubricating-jelly"
+  },
+  {
+    "prod": "dg0001n",
+    "link": "dg0001n-back-seam-fishnet-stay-ups-with-lace-top",
+    "newLink": "dg0001n-fishnet-stay-up"
+  },
+  {
+    "prod": "dg0002",
+    "link": "dg0002-sheer-thigh-high-with-lace-top",
+    "newLink": "dg0002"
+  },
+  {
+    "prod": "dg0002x",
+    "link": "dg0002x-sheer-thigh-high-with-lace-top",
+    "newLink": "dg0002x-fishnet-stay-up"
+  },
+  {
+    "prod": "dg0005",
+    "link": "dg0005-sheer-stay-up",
+    "newLink": "dg0005"
+  },
+  {
+    "prod": "dg0005n",
+    "link": "dg0005n-sheer-stay-up",
+    "newLink": "dg0005n"
+  },
+  {
+    "prod": "dg0005x",
+    "link": "dg0005x-sheer-stay-up",
+    "newLink": "dg0005x"
+  },
+  {
+    "prod": "dg0006",
+    "link": "dg0006-lace-top-fishnet-thigh-hi",
+    "newLink": "dg0006"
+  },
+  {
+    "prod": "dg0006x",
+    "link": "dg0006x-lace-top-fishnet-thigh-hi",
+    "newLink": "dg0006x"
+  },
+  {
+    "prod": "dg0007",
+    "link": "dg0007-sheer-thigh-hi",
+    "newLink": "dg0007-backseam-thigh-hi"
+  },
+  {
+    "prod": "dg0007x",
+    "link": "dg0007x-backseam-thigh-hi",
+    "newLink": "dg0007x-w-backseam-thigh-hi"
+  },
+  {
+    "prod": "dg0010",
+    "link": "dg0010-fence-net-pantyhose",
+    "newLink": "dg0010"
+  },
+  {
+    "prod": "dg0011",
+    "link": "dg0011-fishnet-pantyhose-back-seam",
+    "newLink": "dg0011-backseam-net-pantyhose"
+  },
+  {
+    "prod": "dg0011x",
+    "link": "dg0011x-fishnet-pantyhose-back-seam",
+    "newLink": "dg0011-backseam-net-pantyhose-1"
+  },
+  {
+    "prod": "dg0015",
+    "link": "dg0015-open-crotch-fishnet-bodystocking",
+    "newLink": "dg0015-fishnet-bodystocking"
+  },
+  {
+    "prod": "dg0015x",
+    "link": "dg0015x-open-crotch-fishnet-bodystocking",
+    "newLink": "dg0015-fishnet-bodystocking-1"
+  },
+  {
+    "prod": "dg0035",
+    "link": "dg0035-semi-sheer-halter-garter-dress",
+    "newLink": "dg0035-sheer-garter-dress"
+  },
+  {
+    "prod": "dg0035x",
+    "link": "dg0035x-semi-sheer-halter-garter-dress",
+    "newLink": "dg0035x"
+  },
+  {
+    "prod": "dg0079",
+    "link": "dg0079-open-crotch-fishnet-bodystocking",
+    "newLink": "dg0079-fishnet-bodystocking"
+  },
+  {
+    "prod": "dg0079n",
+    "link": "dg0079n-open-crotch-fishnet-bodystocking",
+    "newLink": "dg0079-fishnet-bodystocking-1"
+  },
+  {
+    "prod": "dg0082",
+    "link": "dg0082-sheer-open-crotch-pantyhose",
+    "newLink": "dg0082-sheer-open-pantyhose"
+  },
+  {
+    "prod": "dg0082x",
+    "link": "dg0082x-sheer-open-crotch-pantyhose",
+    "newLink": "dg0082x"
+  },
+  {
+    "prod": "dg0115",
+    "link": "dg0115-fence-net-stockings-stay-up-lace-top",
+    "newLink": "dg0115-fence-net-stay-up"
+  },
+  {
+    "prod": "dg0144",
+    "link": "dg0144-lace-garter-dress",
+    "newLink": "dg0144-garter-dress"
+  },
+  {
+    "prod": "dg0145",
+    "link": "dg0145-fishnet-halter-dress",
+    "newLink": "dg0145-lace-garter-dress"
+  },
+  {
+    "prod": "dg0219",
+    "link": "dg0219-sheer-boot-design-thigh-hi",
+    "newLink": "dg0219-boot-print-thigh-hi"
+  },
+  {
+    "prod": "dg0250",
+    "link": "dg0250-semi-opaque-suspender-pantyhose",
+    "newLink": "dg0250-suspender-pantyhose"
+  },
+  {
+    "prod": "dg0313",
+    "link": "dg0313-opaque-teddy-and-thigh-high-stockings",
+    "newLink": "dg0313-2pc-set"
+  },
+  {
+    "prod": "dg0329",
+    "link": "dg0329-teddy-bodystocking-with-attached-thigh-hi",
+    "newLink": "dg0329-teddy-bodystocking"
+  },
+  {
+    "prod": "dg0367",
+    "link": "dg0367-opaque-insets-net-pantyhose",
+    "newLink": "dg0367-multi-pattern-pantyhose"
+  },
+  {
+    "prod": "dg0369",
+    "link": "dg0369-double-fence-net-pantyhose",
+    "newLink": "dg0369-double-net-pantyhose"
+  },
+  {
+    "prod": "dg0369x",
+    "link": "dg0369x-double-fence-net-pantyhose",
+    "newLink": "dg0369x-double-net-pantyhose"
+  },
+  {
+    "prod": "dg0417",
+    "link": "dg0417-leopard-net-bodystocking",
+    "newLink": "dg0417-2pc-cheetah-bodystocking"
+  },
+  {
+    "prod": "dg0425",
+    "link": "dg0425-2pc-lace-bodystocking",
+    "newLink": "dg0441-asymmetrical-teddy-bodystocking-1"
+  },
+  {
+    "prod": "dg0441",
+    "link": "dg0441-teddy-bodystocking",
+    "newLink": "dg0441-asymmetrical-teddy-bodystocking"
+  },
+  {
+    "prod": "dg0444x",
+    "link": "dg0444x-butterfly-bodystocking",
+    "newLink": "dg0444x-butterfly-net-bodystocking"
+  },
+  {
+    "prod": "dg0447",
+    "link": "dg0447-garter-dress",
+    "newLink": "dg0447-side-lace-garter-dress"
+  },
+  {
+    "prod": "dg0501",
+    "link": "dg0501-suspender-pantyhose",
+    "newLink": "dg0501-eyelet-suspender-pantyhose"
+  },
+  {
+    "prod": "dg0506",
+    "link": "dg0506-seamless-knit-gown",
+    "newLink": "dg0506-seamless-gown"
+  },
+  {
+    "prod": "dg0517",
+    "link": "dg0517-rhinestone-bodystocking",
+    "newLink": "dg0517-sheer-gown"
+  },
+  {
+    "prod": "dg0523",
+    "link": "dg0523-2pc-gown-shrug",
+    "newLink": "dg0523-2pc-bodystocking"
+  },
+  {
+    "prod": "dg0529",
+    "link": "dg0529-lace-pantyhose",
+    "newLink": "dg0529-lace-illusion-pantyhose"
+  },
+  {
+    "prod": "dg0533",
+    "link": "dg0533-leopard-stay-up",
+    "newLink": "dg0533-leopard-stay-ups"
+  },
+  {
+    "prod": "dg0543",
+    "link": "dg0543-lace-stay-up",
+    "newLink": "dg0543-lace-stay-ups"
+  },
+  {
+    "prod": "dg10559",
+    "link": "dg10559-mesh-and-elastic-bustier-g-string",
+    "newLink": "dg10559-fetish-bustier"
+  },
+  {
+    "prod": "dg10575",
+    "link": "dg10575-fishnet-halter-teddy-restraints",
+    "newLink": "dg10575-fishnet-teddy"
+  },
+  {
+    "prod": "dg10590",
+    "link": "dg10590-4pc-french-maid-fantasy",
+    "newLink": "dg10590-french-maid-fantasy-4pc"
+  },
+  {
+    "prod": "dg10983",
+    "link": "dg10983-lace-garter",
+    "newLink": "dg10983-lace-garter-wallet"
+  },
+  {
+    "prod": "dg11046",
+    "link": "dg11046-homeroom-hottie-4pc",
+    "newLink": "dg11046-homeroom-hottie-5pc"
+  },
+  {
+    "prod": "dg11853",
+    "link": "dg11853-studded-teddy-handcuffs",
+    "newLink": "dg11853-fetish-teddy"
+  },
+  {
+    "prod": "dg11855",
+    "link": "dg11855-3pc-lieutenant-lusty",
+    "newLink": "dg11855-lieutenant-lusty-4pc"
+  },
+  {
+    "prod": "dg12125",
+    "link": "dg12125-lace-and-net-bustier",
+    "newLink": "dg12125-lace-net-bustier"
+  },
+  {
+    "prod": "dg12199",
+    "link": "dg12199-venise-lace-garter-slip",
+    "newLink": "dg12199-venice-garter-slip"
+  },
+  {
+    "prod": "dg12236",
+    "link": "dg12236-babydoll-wgarter",
+    "newLink": "dg12236-heart-lace-babydoll"
+  },
+  {
+    "prod": "dg12246",
+    "link": "dg12246-seamless-fishnet-chemise",
+    "newLink": "dg12246-versatile-chemise"
+  },
+  {
+    "prod": "dg12246x",
+    "link": "dg12246x-seamless-fishnet-chemise",
+    "newLink": "dg12246x-versatile-chemise"
+  },
+  {
+    "prod": "dg12606",
+    "link": "dg12606-criss-cross-collar-babydoll",
+    "newLink": "dg12606-crossed-collar-babydoll"
+  },
+  {
+    "prod": "dg12606x",
+    "link": "dg12606x-criss-cross-collar-babydoll",
+    "newLink": "dg12606x-crossed-collar-babydoll"
+  },
+  {
+    "prod": "dg12702",
+    "link": "dg12702-sheer-lace-garter-slip",
+    "newLink": "dg12702-heart-garter-slip"
+  },
+  {
+    "prod": "dg12708",
+    "link": "dg12708-lace-bustier",
+    "newLink": "dg12708-lace-teddy"
+  },
+  {
+    "prod": "dg12814x",
+    "link": "dg12814x-restraint-teddy",
+    "newLink": "dg12814x-lock-restraint-teddy"
+  },
+  {
+    "prod": "dg12816",
+    "link": "dg12816-teddy-and-cuffs",
+    "newLink": "dg12816-teddy-cuffs"
+  },
+  {
+    "prod": "dg12832",
+    "link": "dg12832-pearl-back-teddy",
+    "newLink": "dg12832-2pc-skirt-teddy"
+  },
+  {
+    "prod": "dg12914",
+    "link": "dg12914-bunny-vixen-2pc",
+    "newLink": "dg12832-2pc-skirt-teddy-1"
+  },
+  {
+    "prod": "dg13268",
+    "link": "dg13268-2pc-garterbelt-teddy",
+    "newLink": "dg13268-2pc-harness-teddy"
+  },
+  {
+    "prod": "dg13314",
+    "link": "dg13314-flyaway-handkerchief-babydoll",
+    "newLink": "dg13314-flyaway-babydoll"
+  },
+  {
+    "prod": "dg13314x",
+    "link": "dg13314x-flyaway-handkerchief-babydoll",
+    "newLink": "dg13314x-flyaway-babydoll"
+  },
+  {
+    "prod": "dg13675",
+    "link": "dg13675-seamless-chemise",
+    "newLink": "dg13675-long-sleeve-chemise"
+  },
+  {
+    "prod": "dg13675x",
+    "link": "dg13675x-seamless-chemise",
+    "newLink": "dg13675-long-sleeve-chemise-1"
+  },
+  {
+    "prod": "dg13679",
+    "link": "dg13679-leopard-lace-teddy",
+    "newLink": "dg13679-rhinestone-chemise"
+  },
+  {
+    "prod": "dg13685",
+    "link": "dg13685-teddy-and-cuffs",
+    "newLink": "dg13682-strappy-teddy-1"
+  },
+  {
+    "prod": "dg13690",
+    "link": "dg13690-2pc-fetish-chemise",
+    "newLink": "dg13690-3pc-fetish-chemise"
+  },
+  {
+    "prod": "dg13697",
+    "link": "dg13697-2pc-pearl-harness-teddy",
+    "newLink": "dg13697-2pc-lace-teddy"
+  },
+  {
+    "prod": "dg13702",
+    "link": "dg13702-boss-babe-2pc",
+    "newLink": "dg13702-boss-babe-1pc"
+  },
+  {
+    "prod": "dg13702x",
+    "link": "dg13702x-boss-babe-2pc",
+    "newLink": "dg13702x-boss-babe-1pc"
+  },
+  {
+    "prod": "dg13709",
+    "link": "dg13709-wet-look-bustier",
+    "newLink": "dg13709x-zipper-garter-slip"
+  },
+  {
+    "prod": "dg13709x",
+    "link": "dg13709x-wet-look-bustier",
+    "newLink": "dg13709x-zipper-garter-slip"
+  },
+  {
+    "prod": "dg1377",
+    "link": "dg1377-heart-back-mesh-panty",
+    "newLink": "dg1377-heart-panty"
+  },
+  {
+    "prod": "dg4575",
+    "link": "dg4575-roxie-hot-short",
+    "newLink": "promo75-dg4575-roxie-hot-short"
+  },
+  {
+    "prod": "dg4575x",
+    "link": "dg4575x-roxie-hot-short",
+    "newLink": "promo75-dg4575x-roxie-hot-short"
+  },
+  {
+    "prod": "dg7031",
+    "link": "dg7031-sheer-thigh-highs-with-back-seam",
+    "newLink": "dg7031-backseam-thigh-high"
+  },
+  {
+    "prod": "dg7177",
+    "link": "dg7177-open-crotch-lace-boyshort",
+    "newLink": "dg7177-open-boyshort"
+  },
+  {
+    "prod": "dg7177x",
+    "link": "dg7177x-open-crotch-lace-boyshort",
+    "newLink": "dg7177x-open-boyshort"
+  },
+  {
+    "prod": "dg9546",
+    "link": "dg9546-2pc-pirate-mini-kit",
+    "newLink": "promo60-dg9546-pirate-mini-kit"
+  },
+  {
+    "prod": "fagl2126x",
+    "link": "fagl2126x-3pc-footless-bodystocking",
+    "newLink": "fagl2126x-3pc-uv-footless-bodystocking"
+  },
+  {
+    "prod": "ma101",
+    "link": "ma101-criss-cross-back-strappy-panty",
+    "newLink": "ma101-strappy-panty"
+  },
+  {
+    "prod": "ma107",
+    "link": "ma107-lace-keyhole-thong",
+    "newLink": "ma107-lace-g-string"
+  },
+  {
+    "prod": "ma1092",
+    "link": "ma1092-metal-clips-thong",
+    "newLink": "ma1092-clip-y-back-thong"
+  },
+  {
+    "prod": "ma1132",
+    "link": "ma1132-net-rhinestone-bodystocking",
+    "newLink": "ma1132-rhinestone-bodystocking"
+  },
+  {
+    "prod": "ml10013",
+    "link": "ml10013-open-crotch-lace-panty",
+    "newLink": "ml10013-open-lace-thong"
+  },
+  {
+    "prod": "ml1030",
+    "link": "ml1030-fishnet-bodystocking",
+    "newLink": "ml1030-multi-net-bodystocking"
+  },
+  {
+    "prod": "ml1031",
+    "link": "ml1031-open-bust-fishnet-bodystocking",
+    "newLink": "ml1031-open-bust-bodystocking"
+  },
+  {
+    "prod": "ml1102",
+    "link": "ml1102-asymmetric-bodystocking",
+    "newLink": "ml1102-fishnet-bodystocking"
+  },
+  {
+    "prod": "ml1158",
+    "link": "ml1158-bandage-print-bodystocking",
+    "newLink": "ml1158-cross-print-bodystocking"
+  },
+  {
+    "prod": "ml1325",
+    "link": "ml1325-side-cut-outs-bodystocking",
+    "newLink": "ml1325-sheer-side-bodystocking"
+  },
+  {
+    "prod": "ml1480",
+    "link": "ml1480-lace-bodystocking",
+    "newLink": "ml1480-high-neck-bodystocking"
+  },
+  {
+    "prod": "ml1743",
+    "link": "ml1743-heart-cut-out-garter-dress",
+    "newLink": "ml1743-heart-garter-dress"
+  },
+  {
+    "prod": "ml1783",
+    "link": "ml1783-floral-bodice-garter-print-bodystocking",
+    "newLink": "ml1783-teddy-bodystocking"
+  },
+  {
+    "prod": "ml1783-p",
+    "link": "ml1783-p-garter-print-bodystocking",
+    "newLink": "ml1783-teddy-bodystocking-1"
+  },
+  {
+    "prod": "ml2119q",
+    "link": "ml2119q-striped-fishnet-bodystocking",
+    "newLink": "ml2119q-striped-garter-dress"
+  },
+  {
+    "prod": "ml331",
+    "link": "ml331-backseam-pantyhose",
+    "newLink": "ml331-sheer-backseam-pantyhose"
+  },
+  {
+    "prod": "ml333",
+    "link": "ml333-stretch-sheer-control-top-pantyhose",
+    "newLink": "ml333-control-top-pantyhose"
+  },
+  {
+    "prod": "ml334",
+    "link": "ml334-sheer-2-in-1-stockings",
+    "newLink": "ml334-2-in-1-stockings"
+  },
+  {
+    "prod": "ml338",
+    "link": "ml338-sheer-stretch-suspender-pantyhose",
+    "newLink": "ml338-suspender-pantyhose"
+  },
+  {
+    "prod": "ml35127",
+    "link": "ml35127-big-hole-leggings",
+    "newLink": "ml35127-hole-leggings"
+  },
+  {
+    "prod": "ml445",
+    "link": "ml445-fishnet-gloves",
+    "newLink": "ml445-diamond-net-gloves"
+  },
+  {
+    "prod": "ml4542",
+    "link": "ml4542-multi-strands-fishnet-thigh-hi",
+    "newLink": "ml4542-multinet-thigh-hi"
+  },
+  {
+    "prod": "ml45437q",
+    "link": "ml45437q-lace-stay-up-top-multi-strands-fishnet-thigh-hi",
+    "newLink": "ml45437q-multinet-stay-up"
+  },
+  {
+    "prod": "ml464",
+    "link": "ml464-lace-gloves",
+    "newLink": "ml464-xl-lace-gloves"
+  },
+  {
+    "prod": "ml4770q",
+    "link": "ml4770q-spiderweb-thigh-hi",
+    "newLink": "ml4770q-spider-web-thigh-hi"
+  },
+  {
+    "prod": "ml4917",
+    "link": "ml4917-fishnet-thigh-hi",
+    "newLink": "ml4917-raw-net-thigh-hi"
+  },
+  {
+    "prod": "ml4919",
+    "link": "ml4919-lace-top-backseam-fishnet-thigh-hi",
+    "newLink": "ml4919-backseam-net-thigh-hi"
+  },
+  {
+    "prod": "ml4924",
+    "link": "ml4924-diamond-fishnet-thigh-hi",
+    "newLink": "ml4924-fence-net-thigh-hi"
+  },
+  {
+    "prod": "ml4931",
+    "link": "ml4931-lace-top-fishnet-thigh-hi",
+    "newLink": "ml4931-fishnet-thigh-hi"
+  },
+  {
+    "prod": "ml4992",
+    "link": "ml4992-lace-top-fishnet-stay-ups",
+    "newLink": "ml4992-net-stay-up"
+  },
+  {
+    "prod": "ml50011",
+    "link": "ml50011-floral-lace-pantyhose",
+    "newLink": "ml50011-floral-pantyhose"
+  },
+  {
+    "prod": "ml50024x",
+    "link": "ml50024q-thick-net-pantyhose",
+    "newLink": "ml50024x-thick-net-pantyhose"
+  },
+  {
+    "prod": "ml60016",
+    "link": "ml60016-criss-cross-neckline-fishnet-chemise",
+    "newLink": "ml60016-criss-cross-chemise"
+  },
+  {
+    "prod": "ml60120",
+    "link": "ml60120-strappy-rhinestone-chemise",
+    "newLink": "ml60120-multi-net-rhinestone-chemise"
+  },
+  {
+    "prod": "ml6405",
+    "link": "ml6405-opaque-cutout-dress",
+    "newLink": "ml6405-cutout-dress"
+  },
+  {
+    "prod": "ml6628",
+    "link": "ml6628-fishnet-dress",
+    "newLink": "ml6628-strappy-dress"
+  },
+  {
+    "prod": "ml6795",
+    "link": "ml6795-fishnet-dress",
+    "newLink": "ml6795-leopard-dress"
+  },
+  {
+    "prod": "ml6795q",
+    "link": "ml6795q-fishnet-dress",
+    "newLink": "ml6795q-leopard-dress"
+  },
+  {
+    "prod": "ml703",
+    "link": "ml703-suspender-pantyhose",
+    "newLink": "ml703-opaque-suspender-pantyhose"
+  },
+  {
+    "prod": "ml7707",
+    "link": "ml7707-lace-garterbelt-set",
+    "newLink": "ml7707-lace-garterbelt-panty"
+  },
+  {
+    "prod": "ml7900",
+    "link": "ml7900-lace-top-fishnet-suspender",
+    "newLink": "ml7900-fishnet-suspender-pantyhose"
+  },
+  {
+    "prod": "ml800",
+    "link": "ml800-sheer-open-crotch-pantyhose",
+    "newLink": "ml800-sheer-open-pantyhose"
+  },
+  {
+    "prod": "ml80017",
+    "link": "ml80017-lace-teddy-handcuffs",
+    "newLink": "ml80017-lace-teddy"
+  },
+  {
+    "prod": "ml80081",
+    "link": "ml80081-shredded-straps-fishnet-teddy",
+    "newLink": "ml80081-fishnet-teddy"
+  },
+  {
+    "prod": "ml801",
+    "link": "ml801-sheer-pantyhose",
+    "newLink": "ml801-sheer-open-pantyhose"
+  },
+  {
+    "prod": "ml803",
+    "link": "ml803-sheer-suspender",
+    "newLink": "ml803-sheer-suspender-pantyhose"
+  },
+  {
+    "prod": "ml8629",
+    "link": "ml8629-lace-fishnet-teddy",
+    "newLink": "ml8629-multi-net-teddy"
+  },
+  {
+    "prod": "ml8629q",
+    "link": "ml8629q-lace-fishnet-teddy",
+    "newLink": "ml8629q-teddy"
+  },
+  {
+    "prod": "ml88011",
+    "link": "ml88011-cross-pasties",
+    "newLink": "ml88011-cross-pasties-3-pairs"
+  },
+  {
+    "prod": "ml9000",
+    "link": "ml9000-seamless-fishnet-pantyhose",
+    "newLink": "ml9000-stretch-fishnet-pantyhose"
+  },
+  {
+    "prod": "ml9000q",
+    "link": "ml9000q-seamless-spandex-pantyhose",
+    "newLink": "ml9000q-stretch-fishnet-pantyhose"
+  },
+  {
+    "prod": "ml901",
+    "link": "ml901-fishnet-open-pantyhose",
+    "newLink": "ml901-open-net-pantyhose"
+  },
+  {
+    "prod": "ml901q",
+    "link": "ml901q-mini-net-pantyhose",
+    "newLink": "ml901q-open-net-pantyhose"
+  },
+  {
+    "prod": "ml911",
+    "link": "ml911-lace-and-net-suspender",
+    "newLink": "ml911-lace-net-suspender-pantyhose"
+  },
+  {
+    "prod": "ml918",
+    "link": "ml918-heart-lace-suspender-pantyhose",
+    "newLink": "ml918-heart-suspender-pantyhose"
+  },
+  {
+    "prod": "ml933",
+    "link": "ml933-bow-lace-suspender",
+    "newLink": "ml933-suspender-pantyhose"
+  },
+  {
+    "prod": "ta11656",
+    "link": "ta11656-36x-hanging-tags-round-permanent-adhesive-clear",
+    "newLink": "ta11655-40x-tag-j-hook-1"
+  },
+  {
+    "prod": "ta11659",
+    "link": "ta11659-40x-hang-tabs-oval-permanent-adhesive-clear",
+    "newLink": "ta11655-40x-tag-j-hook-2"
+  },
+  {
+    "prod": "ta1506",
+    "link": "ta1506-waist-trainer-gym",
+    "newLink": "ta1506-gym-work-out"
+  }
+]

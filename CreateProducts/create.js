@@ -1,6 +1,6 @@
 import { executeGraphQL } from './graphql.js';
 
-const SALEOR_API_URL = 'http://localhost:8000/graphql/';
+const SALEOR_API_URL = process.env.SALEOR_API_URL;
 const randomNum = Math.floor(Math.random() * 1000);
 const randomBase64 = Buffer.from(String(randomNum)).toString('base64');
 

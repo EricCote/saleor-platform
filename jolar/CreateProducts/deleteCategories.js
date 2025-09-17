@@ -9,9 +9,9 @@ import {
   fetchAllProducts,
 } from './fetchers.js';
 
-const collections = (await fetchAllCollections()).filter((col) => col.nopId);
+const collections = (await fetchAllCollections()).filter((col) => col.jolar);
 
-const categories = (await fetchAllCategories()).filter((cat) => cat.nopId);
+const categories = (await fetchAllCategories()).filter((cat) => cat.jolar);
 
 const response = await deleteCollections(collections);
 console.log(response);

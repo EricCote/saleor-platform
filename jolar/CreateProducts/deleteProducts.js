@@ -9,7 +9,7 @@ import {
   fetchAllProducts,
 } from './fetchers.js';
 
-const products = (await fetchAllProducts()).filter((p) => p.nopId);
+const products = (await fetchAllProducts()).filter((p) => p.jolar);
 
 const response = await deleteProducts(products);
 console.log(response);

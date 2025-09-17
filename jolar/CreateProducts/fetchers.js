@@ -89,7 +89,6 @@ export async function fetchMenuId(name) {
             name
             slug
             jolar: privateMetafield(key: "jolar")
-            sd: privateMetafield(key: "sd")
       }
     }
 `;
@@ -108,7 +107,6 @@ export async function fetchProductType(name) {
             name
             slug
             jolar: privateMetafield(key: "jolar")
-            sd: privateMetafield(key: "sd")
           }
         }
       }
@@ -138,7 +136,6 @@ export async function fetchAllProductTypesExcept(slug) {
             name
             slug
             jolar: privateMetafield(key: "jolar")
-            sd: privateMetafield(key: "sd")
           }
         }
       }
@@ -167,7 +164,6 @@ export async function fetchAllAttributes() {
             name
             slug
             jolar: privateMetafield(key: "jolar")
-            sd: privateMetafield(key: "sd")
           }
         }
       }
@@ -246,7 +242,7 @@ export async function fetchMenuItems() {
           node {
             id
             name
-            sd: privateMetafield(key: "sd")
+           
             jolar: privateMetafield(key: "jolar")
           }
         }
@@ -268,7 +264,6 @@ export async function fetchMenus() {
             name
             slug
             jolar: privateMetafield(key: "jolar")
-            sd: privateMetafield(key: "sd")
           }
         }
       }

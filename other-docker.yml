@@ -37,12 +37,46 @@ services:
       start_period: 10s # Give the service some time to start up before checking
 
 
+  api-jolar:
+    image: ghcr.io/saleor/saleor:latest
+    ports:
+      - 8001:8000
+    restart: unless-stopped
+    networks:
+      - saleor-backend-tier
+    stdin_open: true
+    tty: true
+    depends_on:
+      redis:
+        condition: service_started
+      jaeger:
+        condition: service_started
+      db:
+        condition: service_healthy 
+    volumes:
+      # shared volume between worker and api for media
+      - jolar-media:/app/media
+    env_file:
+      - common.env
+      - jolar/backend.env
+    environment:
+      DASHBOARD_URL: ${DASHBOARD_JOLAR}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS}
+      PUBLIC_URL: ${PUBLIC_JOLAR}
+    healthcheck:
+      test: 
+        - "CMD-SHELL"
+        - "-c"
+        - "python"
+        - "import http.client; conn = http.client.HTTPConnection('localhost', 8000); try: conn.request('GET', '/graphql/'); res = conn.getresponse(); exit(0) if res.status == 200 else exit(1); except: exit(1)"
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s # Give the service some time to start up before checking
 
 
 
   storefront:
-    profiles: 
-      - dev
     build:
       context: ./storefront
       dockerfile: Dockerfile
@@ -100,6 +134,15 @@ services:
     environment:
       API_URL: ${API_URL}
 
+
+  dashboard-jolar:
+    image: ghcr.io/saleor/saleor-dashboard:latest
+    ports:
+      - 9001:80
+    restart: unless-stopped
+    environment:
+      API_URL: ${API_JOLAR}      
+
   db:
     image: library/postgres:alpine
     ports:
@@ -151,6 +194,21 @@ services:
       # shared volume between worker and api for media
       - saleor-media:/app/media
 
+  worker-jolar:
+    image: ghcr.io/saleor/saleor:latest
+    command: celery --app=saleor.celeryconf:app worker -E --loglevel=info 
+    restart: unless-stopped
+    networks:
+      - saleor-backend-tier
+    env_file:
+      - common.env
+      - jolar/backend.env
+    depends_on:
+      - redis
+      - mailpit
+    volumes:
+      # shared volume between worker and api for media
+      - jolar-media:/app/media
 
 
 
@@ -205,6 +263,7 @@ volumes:
   saleor-redis:
     driver: local
   saleor-media:
+  jolar-media:
   node_modules_store:
   next_compile_folder:
   pgadmin-data:

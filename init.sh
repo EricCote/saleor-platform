@@ -9,7 +9,10 @@ docker compose run --rm storefront sh -c "HUSKY=0 pnpm install"
 docker compose down 
 docker compose up api -d
 docker compose build --no-cache storefront_prod
+
 docker compose up -d
+# or
+# docker compose --profile dev up -d
 
 
 if [[ -v NVM_DIR ]]; then

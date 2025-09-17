@@ -2,7 +2,7 @@ import { executeGraphQL } from './graphql.js';
 import 'dotenv/config';
 import { fetchMenuItems } from './fetchers.js';
 
-const menus = (await fetchMenuItems()).filter((m) => m.sd);
+const menus = (await fetchMenuItems()).filter((m) => m.jolar);
 
 const response = await deleteMenuItems(menus);
 console.log(response);
