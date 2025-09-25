@@ -1,10 +1,14 @@
 
-docker compose build
+
 docker compose pull
 docker compose run --rm api python3 manage.py migrate
 #docker compose run --rm api python3 manage.py populatedb
 docker compose run --rm api python3 manage.py createsuperuser --no-input
-docker compose run --rm storefront sh -c "HUSKY=0 COREPACK_ENABLE_DOWNLOAD_PROMPT=0 pnpm install"
+
+#Only dev Mode
+#docker compose up api -d
+#docker compose build storefront
+#docker compose run --rm storefront sh -c "HUSKY=0 COREPACK_ENABLE_DOWNLOAD_PROMPT=0 pnpm install"
 
 docker compose down 
 docker compose up api -d
@@ -19,7 +23,7 @@ if [[ -v NVM_DIR ]]; then
   echo "NVM is installed.  No need to install node."
 else
   # Loads and installs nvm
-  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/master/install.sh | bash
   #refresh env variables
   source ~/.bashrc
 
@@ -27,8 +31,16 @@ else
   nvm use --lts
 fi
 
-cd CreateProducts
+cd jolar/CreateProducts
+corepack enable
+corepack prepare pnpm@latest --activate
+pnpm install
+echo 0 > currentProductPos.txt
+node generateProductNames.js
 node init.js
+node attributes.js
 node categories.js
 node menus.js
 node products.js
+node featured.js
+

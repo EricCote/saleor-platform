@@ -1,4 +1,4 @@
-import { executeGraphQL } from './graphql.js';
+import { executeGraphQL } from '../../CreateProducts/graphql.js';
 import {
   fetchChannel,
   fetchWarehouse,
