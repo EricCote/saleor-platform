@@ -1,7 +1,7 @@
 import util from 'util';
 import { GetDataFromFile } from './excel.js';
 
-const jsonData = GetDataFromFile('./data2.xlsx');
+const jsonData = GetDataFromFile('./data3.xlsx');
 
 const TestWhenProductIsNull = jsonData.filter((el) => !el.Product);
 showCount('When Product is null', TestWhenProductIsNull);
@@ -115,7 +115,11 @@ console.log(groupingByCat);
 // the main list keeps products that have more than 20 items, have a price and are not discontinued
 
 const mainList = jsonData.filter(
-  (p) => p['AT Ship'] >= 20 && p.Discontinued == 0 && p.Price > 0
+  (p) =>
+    p['AT Ship'] >= 20 &&
+    p.Discontinued == 0 &&
+    p.Price > 0 &&
+    p.PType != 'Supply'
   // p.PGroup != 'Discontinué' &&
   // p.PGroup != 'Disc'
 );
@@ -135,10 +139,10 @@ const mainListWithVariants = jsonData.filter(
     uniqueProducts.includes(p.Product) &&
     p.Discontinued == 0 &&
     p.Price > 0 &&
-    p['AT Ship'] >= 6
+    p['AT Ship'] >= 1
 );
 
-showCount('variants keeping similar variants >= 6', mainListWithVariants);
+showCount('variants keeping similar variants >= 1', mainListWithVariants);
 groupStat(
   mainListWithVariants,
   (p) => p.Product,

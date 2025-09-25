@@ -137,7 +137,8 @@ services:
 #command: celery -A saleor -B
   worker:
     image: ghcr.io/saleor/saleor:latest
-    command: celery --app=saleor.celeryconf:app worker -E --loglevel=info 
+    command: celery --app=saleor.celeryconf:app worker --beat --scheduler=saleor.schedulers.schedulers.DatabaseScheduler -E --loglevel=info 
+    # command: celery --app=saleor.celeryconf:app worker  -E --loglevel=info 
     restart: unless-stopped
     networks:
       - saleor-backend-tier
@@ -150,8 +151,20 @@ services:
     volumes:
       # shared volume between worker and api for media
       - saleor-media:/app/media
-
-
+      
+  flower:
+    image: mher/flower:latest
+    profiles: 
+      - dev 
+    depends_on: 
+      - redis 
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - FLOWER_UNAUTHENTICATED_API=true
+    networks: 
+      - saleor-backend-tier 
+    ports: 
+      - "5555:5555"
 
 
 

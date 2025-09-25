@@ -1,6 +1,9 @@
-import { executeGraphQL } from './graphql.js';
+import { executeGraphQL } from '../../CreateProducts/graphql.js';
 import 'dotenv/config';
-import { fetchAllAttributes, fetchAllProductTypesExcept } from './fetchers.js';
+import {
+  fetchAllAttributes,
+  fetchAllProductTypesExcept,
+} from '../../CreateProducts/fetchers.js';
 
 async function deleteProdTypes(productTypes) {
   const productTypeList = productTypes.map((p) => p.id);

@@ -1,13 +1,6 @@
-import { executeGraphQL } from './graphql.js';
+import { executeGraphQL } from '../../CreateProducts/graphql.js';
 import 'dotenv/config';
-import {
-  fetchProductType,
-  fetchAllCategories,
-  fetchChannel,
-  fetchWarehouse,
-  fetchAllCollections,
-  fetchAllProducts,
-} from './fetchers.js';
+import { fetchAllProducts } from '../../CreateProducts/fetchers.js';
 
 const products = (await fetchAllProducts()).filter((p) => p.jolar);
 

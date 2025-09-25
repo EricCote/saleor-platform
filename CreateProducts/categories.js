@@ -231,7 +231,7 @@ async function createSubCategories(subCategories) {
 }
 
 async function createCollections(categories) {
-  const channelID = await fetchChannel('Default Channel');
+  const channelID = await fetchChannel('default-channel');
 
   for (const category of categories.recordset) {
     const { id, parentCategoryId, nameEn } = category;

@@ -4,14 +4,14 @@ docker compose pull
 docker compose run --rm api python3 manage.py migrate
 #docker compose run --rm api python3 manage.py populatedb
 docker compose run --rm api python3 manage.py createsuperuser --no-input
-docker compose run --rm storefront sh -c "HUSKY=0 pnpm install"
+docker compose run --rm storefront sh -c "HUSKY=0 COREPACK_ENABLE_DOWNLOAD_PROMPT=0 pnpm install"
 
 docker compose down 
 docker compose up api -d
 docker compose build --no-cache storefront_prod
 
 docker compose up -d
-# or
+# or if dev mode:
 # docker compose --profile dev up -d
 
 

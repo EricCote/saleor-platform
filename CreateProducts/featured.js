@@ -108,7 +108,7 @@ async function createCollection() {
 
   const resCh = await updateCollectionChannelListing(
     collectionId,
-    await fetchChannel('Default Channel'),
+    await fetchChannel('default-channel'),
     true
   );
 

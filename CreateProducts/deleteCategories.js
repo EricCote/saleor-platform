@@ -1,13 +1,6 @@
 import { executeGraphQL } from './graphql.js';
 import 'dotenv/config';
-import {
-  fetchProductType,
-  fetchAllCategories,
-  fetchChannel,
-  fetchWarehouse,
-  fetchAllCollections,
-  fetchAllProducts,
-} from './fetchers.js';
+import { fetchAllCategories, fetchAllCollections } from './fetchers.js';
 
 const collections = (await fetchAllCollections()).filter((col) => col.nopId);
 

@@ -1,8 +1,12 @@
 import { executeGraphQL } from './graphql.js';
-import { fetchChannel, fetchWarehouse, fetchShip } from './fetchers.js';
+import {
+  fetchChannel,
+  fetchWarehouse,
+  fetchShip,
+} from '../../CreateProducts/fetchers.js';
 
-const defChannelId = await fetchChannel('Default Channel');
-let channelId = await fetchChannel('Default Channel');
+const defChannelId = await fetchChannel('default-channel');
+let channelId = await fetchChannel('default-channel');
 const shipId = await fetchShip('Default');
 const warehouseId = await fetchWarehouse('Default');
 
@@ -14,7 +18,7 @@ if (defChannelId) {
 
 //Let's create a new default channel
 //with canadian money, using the default shipping and the default warehouse
-channelId = await fetchChannel('Default Channel');
+channelId = await fetchChannel('default-channel');
 if (!channelId) {
   const res2 = await createDefaultChannel();
   console.log('Create channel result: %o', res2);

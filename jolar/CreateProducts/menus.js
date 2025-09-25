@@ -1,11 +1,59 @@
-import { executeGraphQL } from './graphql.js';
+import { executeGraphQL } from '../../CreateProducts/graphql.js';
 
 import 'dotenv/config';
 import {
   fetchAllCollections,
   fetchCategoryTree,
   fetchMenuId,
-} from './fetchers.js';
+} from '../../CreateProducts/fetchers.js';
+
+const createMenuMutation = `
+      mutation CreateMenuItem($input: MenuItemCreateInput!){
+        menuItemCreate(input: $input){
+          menuItem{
+            id
+            name
+          }
+          errors{
+            field
+            message
+            code
+          }
+        }
+      }
+`;
+const metaMutation = `
+    mutation UpdatePrivateMetadata($id: ID!, $input: [MetadataInput!]!) {
+      updatePrivateMetadata(id: $id, input: $input) {
+        errors {
+          field 
+          message 
+          code
+        }
+        item {
+          privateMetadata {
+            key
+            value
+          }
+        }
+      }
+    }
+  `;
+
+const transMutation = `
+        mutation TranslateMenuItem($id: ID!,$input: NameTranslationInput!, $languageCode: LanguageCodeEnum!) {
+          menuItemTranslate(id: $id, input: $input, languageCode: $languageCode) {
+            menuItem {
+              id 
+            }
+            errors {
+              field
+              message
+              code
+            }
+          }
+        }
+      `;
 
 const cats = (await fetchCategoryTree()).filter((cat) => cat.jolar);
 
@@ -22,9 +70,25 @@ if (!footerId) {
   footerId = await createMenu('footer');
 }
 
-await createMenuItems(cats);
+await createMenuItems(
+  cats[0].children.edges.map((e) => e.node),
+  menuId,
+  null
+);
+await createMenuItems(
+  cats[0].children.edges.map((e) => e.node),
+  footerId,
+  null
+);
 
-function getCollectionId(og, collections) {
+await createMenuItemsSuppliers(collections);
+
+//await createSubMenuItems(collections);
+
+//console.log(cats);
+//console.log(collections);
+
+function getCollectionId(og) {
   return collections.find((col) => og == col.jolar)?.id;
 }
 
@@ -50,55 +114,8 @@ async function createMenu(name) {
   return result.menuCreate.menu.id;
 }
 
-async function createMenuItems(cats) {
-  const createMenuMutation = `
-      mutation CreateMenuItem($input: MenuItemCreateInput!){
-        menuItemCreate(input: $input){
-          menuItem{
-            id
-            name
-          }
-          errors{
-            field
-            message
-            code
-          }
-        }
-      }
-`;
-  const metaMutation = `
-    mutation UpdatePrivateMetadata($id: ID!, $input: [MetadataInput!]!) {
-      updatePrivateMetadata(id: $id, input: $input) {
-        errors {
-          field 
-          message 
-          code
-        }
-        item {
-          privateMetadata {
-            key
-            value
-          }
-        }
-      }
-    }
-  `;
-
-  const transMutation = `
-        mutation TranslateMenuItem($id: ID!,$input: NameTranslationInput!, $languageCode: LanguageCodeEnum!) {
-          menuItemTranslate(id: $id, input: $input, languageCode: $languageCode) {
-            menuItem {
-              id 
-            }
-            errors {
-              field
-              message
-              code
-            }
-          }
-        }
-      `;
-
+//This creates menu items and subitems, both in the main menu and in the footer
+async function createMenuItems(cats, menuId, parentId) {
   for (const c of cats) {
     const variablesMenu = {
       input: {
@@ -107,7 +124,7 @@ async function createMenuItems(cats) {
         category: c.id,
         page: null,
         menu: menuId,
-        parent: null,
+        parent: parentId,
       },
     };
 
@@ -126,7 +143,7 @@ async function createMenuItems(cats) {
       input: {
         name: c.translation.name,
       },
-      languageCode: 'EN',
+      languageCode: 'FR',
     };
 
     const resultTr = await executeGraphQL(transMutation, {
@@ -140,107 +157,98 @@ async function createMenuItems(cats) {
 
     await executeGraphQL(metaMutation, { variables: metaVar });
 
-    //////////////
-    variablesMenu.input.menu = footerId;
+    if (c.children?.edges)
+      await createMenuItems(
+        c.children.edges.map((e) => e.node),
+        menuId,
+        menuItemId
+      );
+  }
+}
 
-    const resultf = await executeGraphQL(createMenuMutation, {
-      variables: variablesMenu,
+async function createMenuItemsSuppliers(collections) {
+  const variablesMenu = {
+    input: {
+      name: 'Suppliers',
+      url: null,
+      category: null,
+      page: null,
+      menu: footerId,
+      parent: null,
+    },
+  };
+
+  const result = await executeGraphQL(createMenuMutation, {
+    variables: variablesMenu,
+  });
+
+  const supMenuItemId = result?.menuItemCreate?.menuItem?.id;
+  if (!supMenuItemId) {
+    console.error('Failed to create menu item for', c.name, result);
+    return;
+  }
+
+  const variablesTr = {
+    id: supMenuItemId,
+    input: {
+      name: 'Fournisseurs',
+    },
+    languageCode: 'FR',
+  };
+
+  const resultTr = await executeGraphQL(transMutation, {
+    variables: variablesTr,
+  });
+
+  const metaVar = {
+    id: supMenuItemId,
+    input: [{ key: 'jolar', value: 'true' }],
+  };
+
+  await executeGraphQL(metaMutation, { variables: metaVar });
+
+  ////
+
+  for (const coll of collections) {
+    const variablesMenu2 = {
+      input: {
+        name: coll.name,
+        url: null,
+        category: null,
+        collection: coll.id,
+        page: null,
+        menu: footerId,
+        parent: supMenuItemId,
+      },
+    };
+
+    const result2 = await executeGraphQL(createMenuMutation, {
+      variables: variablesMenu2,
     });
 
-    const menuItemIdf = resultf?.menuItemCreate?.menuItem?.id;
-    if (!menuItemIdf) {
-      console.error('Failed to create footer menu item for', c.name, resultf);
-      break;
+    const menuItemId = result2?.menuItemCreate?.menuItem?.id;
+    if (!menuItemId) {
+      console.error('Failed to create menu item for', c.name, result);
+      return;
     }
 
-    variablesTr.id = menuItemIdf;
+    const variablesTr2 = {
+      id: menuItemId,
+      input: {
+        name: coll.translation.name,
+      },
+      languageCode: 'FR',
+    };
 
-    const resultTrf = await executeGraphQL(transMutation, {
-      variables: variablesTr,
+    const resultTr2 = await executeGraphQL(transMutation, {
+      variables: variablesTr2,
     });
 
-    const metaVarf = {
-      id: menuItemIdf,
+    const metaVar2 = {
+      id: menuItemId,
       input: [{ key: 'jolar', value: 'true' }],
     };
 
-    await executeGraphQL(metaMutation, { variables: metaVarf });
-
-    for (const s of c.children.edges) {
-      const variablesSubmenu = {
-        input: {
-          name: s.node.name,
-          url: null,
-          category: s.node.id,
-          collection: null,
-          page: null,
-          menu: menuId,
-          parent: menuItemId,
-        },
-      };
-
-      const subResult = await executeGraphQL(createMenuMutation, {
-        variables: variablesSubmenu,
-      });
-
-      const subMenuItemId = subResult?.menuItemCreate?.menuItem?.id;
-      if (!subMenuItemId) {
-        console.error(
-          'Failed to create submenu item for',
-          s.node.name,
-          subResult
-        );
-        break;
-      }
-      const variablesTr = {
-        id: subMenuItemId,
-        input: {
-          name: s.node.translation.name,
-        },
-        languageCode: 'EN',
-      };
-
-      const resultTr = await executeGraphQL(transMutation, {
-        variables: variablesTr,
-      });
-
-      const metaSubVar = {
-        id: subMenuItemId,
-        input: [{ key: 'jolar', value: 'true' }],
-      };
-
-      await executeGraphQL(metaMutation, { variables: metaSubVar });
-
-      ///////
-
-      variablesSubmenu.input.menu = footerId;
-      variablesSubmenu.input.parent = menuItemIdf;
-
-      const subResultf = await executeGraphQL(createMenuMutation, {
-        variables: variablesSubmenu,
-      });
-
-      const subMenuItemIdf = subResultf?.menuItemCreate?.menuItem?.id;
-      if (!subMenuItemIdf) {
-        console.error(
-          'Failed to create submenu item for',
-          s.node.name,
-          subResultf
-        );
-        break;
-      }
-      variablesTr.id = subMenuItemIdf;
-
-      const resultTrf = await executeGraphQL(transMutation, {
-        variables: variablesTr,
-      });
-
-      const metaSubVar2 = {
-        id: subMenuItemIdf,
-        input: [{ key: 'jolar', value: 'true' }],
-      };
-
-      await executeGraphQL(metaMutation, { variables: metaSubVar2 });
-    }
+    await executeGraphQL(metaMutation, { variables: metaVar2 });
   }
 }

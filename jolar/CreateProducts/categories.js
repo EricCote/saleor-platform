@@ -1,4 +1,4 @@
-import { executeGraphQL } from './graphql.js';
+import { executeGraphQL } from '../../CreateProducts/graphql.js';
 import slug from 'slug';
 
 import 'dotenv/config';
@@ -6,101 +6,135 @@ import {
   fetchCategories,
   fetchChannel,
   updateCollectionChannelListing,
-} from './fetchers.js';
+} from '../../CreateProducts/fetchers.js';
 
-const cats = [{ fr: 'Jolar', en: 'Jolar' }];
+const level1 = [{ fr: 'Jolar', en: 'Jolar', og: 'Jolar' }];
 
-const subCats = [
-  { fr: 'Lingerie .', en: 'Lingerie', og: 'Lingerie' },
-  { fr: 'Bas', en: 'Hosiery', og: 'Hosiery' },
-  { fr: 'Costumes', en: 'Costumes', og: 'Costume' },
-  { fr: 'Accessoires', en: 'Accessories', og: 'Accessorie' },
-  { fr: 'Vêtements', en: 'Clothing', og: 'Clothing' },
-  { fr: 'Maillots', en: 'Swimwear', og: 'Swimwear' },
+const level2 = [
+  { fr: 'Lingerie .', en: 'Lingerie', og: 'Lingerie', parent: 'Jolar' },
+  { fr: 'Bas', en: 'Hosiery', og: 'Hosiery', parent: 'Jolar' },
+  { fr: 'Costumes', en: 'Costumes', og: 'Costume', parent: 'Jolar' },
+  { fr: 'Accessoires', en: 'Accessories', og: 'Accessorie', parent: 'Jolar' },
+  { fr: 'Vêtements', en: 'Clothing', og: 'Clothing', parent: 'Jolar' },
+  { fr: 'Maillots', en: 'Swimwear', og: 'Swimwear', parent: 'Jolar' },
 ];
 
 const fournisseurs = [
-  { fr: '665 Leather', en: '665 Leather', og: '665 Leather' },
   { fr: 'Dreamgirl', en: 'DreamGirl', og: 'Dg Brands' },
+  { fr: 'Music Legs', en: 'Music Legs', og: 'Music Legs' },
+  { fr: 'Grupo Espiral', en: 'Grupo Espiral', og: 'Grupo Espiral' },
   {
     fr: 'Fantasy Lingerie',
     en: 'Fantasy Lingerie',
     og: 'Fantasy Lingerie',
   },
-  { fr: 'Grupo Espiral', en: 'Grupo Espiral', og: 'Grupo Espiral' },
+
   { fr: 'Magic Silk', en: 'Magic Silk', og: 'Magic Silk' },
   { fr: 'Male Power', en: 'Male Power', og: 'Male Power' },
-  { fr: 'Music Legs', en: 'Music Legs', og: 'Music Legs' },
+
+  { fr: '665 Leather', en: '665 Leather', og: '665 Leather' },
   { fr: 'Taboo', en: 'Taboo', og: 'Taboo' },
 ];
 
-const collections = [
-  { fr: 'Fetiche', en: 'Fetish', og: 'Fetish' },
-  { fr: 'Bas Stay Up', en: 'Stay Up', og: 'Stay Up' },
-  { fr: 'Bas Jarretelles', en: 'Thigh Hi', og: 'Thigh Hi' },
-  { fr: 'Bas Culottes', en: 'Pantyhose', og: 'Pantyhose' },
-  { fr: 'Bodystocking', en: 'Bodystocking', og: 'Bodystocking' },
-  { fr: 'Teddy', en: 'Teddy', og: 'Teddy' },
-  { fr: 'Bas Jarretelles Attaché', en: 'Suspender', og: 'Suspender' },
+const level3 = [
+  { fr: 'Fetiche', en: 'Fetish', og: 'Fetish', parent: 'Accessorie' },
+  { fr: 'Bas Stay Up', en: 'Stay Up', og: 'Stay Up', parent: 'Hosiery' },
+  { fr: 'Bas Jarretelles', en: 'Thigh Hi', og: 'Thigh Hi', parent: 'Hosiery' },
+  { fr: 'Bas Culottes', en: 'Pantyhose', og: 'Pantyhose', parent: 'Hosiery' },
+  {
+    fr: 'Bodystocking',
+    en: 'Bodystocking',
+    og: 'Bodystocking',
+    parent: 'Lingerie',
+  },
+  { fr: 'Teddy', en: 'Teddy', og: 'Teddy', parent: 'Lingerie' },
+  {
+    fr: 'Bas Jarretelles Attaché',
+    en: 'Suspender',
+    og: 'Suspender',
+    parent: 'Hosiery',
+  },
   {
     fr: 'Babydoll & robe longue',
     en: 'Babydoll & Gown',
     og: 'Babydoll-Chemise',
+    parent: 'Lingerie',
   },
   {
     fr: 'Corset & Bustier',
     en: 'Corset & Bustier',
     og: 'Corset & Bustier',
+    parent: 'Lingerie',
   },
   {
     fr: 'Costume de chambre',
     en: 'Bedroom Costume',
     og: 'Bedroom Costume',
+    parent: 'Lingerie',
   },
-  { fr: 'Porte-jarretelle', en: 'Garterbelt', og: 'Garter' },
-  { fr: 'Multi pièces', en: 'Multi Piece', og: 'Multi Piece' },
-  { fr: 'Bas Culotte', en: 'Panty', og: 'Panty' },
-  { fr: 'Shorts', en: 'Shorts', og: 'Shorts' },
-  { fr: 'Porte-jarretelles', en: 'Garterbelts', og: 'Garterbelts' },
-  { fr: 'Fantaisie', en: 'Fantasy', og: 'Fantasy' },
-  { fr: 'Perruques', en: 'Wig', og: 'Wig' },
-  { fr: 'Comedie', en: 'Comedy', og: 'Comedy' },
-  { fr: 'Valentine', en: 'Valentine', og: 'Valentine' },
-  { fr: 'Bas Sans Pieds', en: 'Footless', og: 'Footless' },
-  { fr: 'Temps des fêtes', en: 'Holiday', og: 'Holiday' },
-  { fr: 'Halloween', en: 'Halloween', og: 'Halloween' },
-  { fr: 'Gants', en: 'Gloves', og: 'Gloves' },
-  { fr: 'Mini Robes', en: 'Mini Dress', og: 'Mini Dress' },
-  { fr: 'Pastilles', en: 'Pasties', og: 'Pasties' },
-  { fr: 'Fournitures', en: 'Supply', og: 'Supply' },
-  { fr: 'Hauts', en: 'Top', og: 'Top' },
+  {
+    fr: 'Porte-jarretelle',
+    en: 'Garterbelt',
+    og: 'Garter',
+    parent: 'Accessorie',
+  },
+  {
+    fr: 'Multi pièces',
+    en: 'Multi Piece',
+    og: 'Multi Piece',
+    parent: 'Lingerie',
+  },
+  { fr: 'Bas Culotte', en: 'Panty', og: 'Panty', parent: 'Lingerie' },
+  { fr: 'Shorts', en: 'Shorts', og: 'Shorts', parent: 'Clothing' },
+  {
+    fr: 'Porte-jarretelles',
+    en: 'Garterbelts',
+    og: 'Garterbelts',
+    parent: 'Lingerie',
+  },
+  { fr: 'Fantaisie', en: 'Fantasy', og: 'Fantasy', parent: 'Costume' },
+  { fr: 'Perruques', en: 'Wig', og: 'Wig', parent: 'Accessorie' },
+  { fr: 'Comedie', en: 'Comedy', og: 'Comedy', parent: 'Costume' },
+  { fr: 'Valentine', en: 'Valentine', og: 'Valentine', parent: 'Lingerie' },
+  { fr: 'Bas Sans Pieds', en: 'Footless', og: 'Footless', parent: 'Hosiery' },
+  { fr: 'Temps des fêtes', en: 'Holiday', og: 'Holiday', parent: 'Hosiery' },
+  { fr: 'Halloween', en: 'Halloween', og: 'Halloween', parent: 'Costume' },
+  { fr: 'Gants', en: 'Gloves', og: 'Gloves', parent: 'Accessorie' },
+  { fr: 'Mini Robes', en: 'Mini Dress', og: 'Mini Dress', parent: 'Lingerie' },
+  { fr: 'Pastilles', en: 'Pasties', og: 'Pasties', parent: 'Accessorie' },
+  //{ fr: 'Fournitures', en: 'Supply', og: 'Supply', parent: 'Accessorie' },
+  { fr: 'Hauts', en: 'Top', og: 'Top', parent: 'Clothing' },
 ];
 
 //console.log('Categories fetched successfully...', cats);
+let categories = await fetchCategories();
+await createCategories(level1);
 
-await createCategories(cats);
-
-const categories = await fetchCategories();
+categories = await fetchCategories();
 //jus keep the parent categories and the ones created by us
 
-const jolarCategoryId = categories.find((c) => c.slug == 'jolar').id;
-console.log('Jolar category id : ', jolarCategoryId);
+console.log(categories);
+await createCategories(level2);
+categories = await fetchCategories();
+console.log(categories);
 
-await createSubCategories(subCats);
-await createCollections(collections);
+await createCategories(level3);
+categories = await fetchCategories();
+console.log(categories);
+
 await createCollections(fournisseurs);
 
 //let subCats = [];
 //await createSubCategories(subCats);
 //await createCollections(subCats);
 
-function getCatId(nopId, categories) {
-  return categories.find((cat) => nopId == cat.nopId)?.id;
+function getCatId(og) {
+  return categories.find((cat) => og == cat.jolar)?.id;
 }
 
 async function createCategories(categories) {
   for (const category of categories) {
-    const { fr: nameFr, en: nameEn } = category;
+    const { fr: nameFr, en: nameEn, parent, og } = category;
     const queryCat = `
       mutation CreateCategory($input: CategoryInput!, $parent: ID) {
         categoryCreate(input: $input, parent: $parent) {
@@ -135,13 +169,13 @@ async function createCategories(categories) {
       `;
     const variablesCat = {
       input: {
-        name: nameFr,
-        slug: slug(nameFr),
-        description: `{"blocks": [{"data": {"text": "Description pour ${nameFr}."}, "type": "paragraph"}]}`,
-        seo: { title: `Catégorie ${nameFr}` },
-        privateMetadata: [{ key: 'jolar', value: 'true' }],
+        name: nameEn,
+        slug: slug(nameEn),
+        description: `{"blocks": [{"data": {"text": "Description for ${nameEn}."}, "type": "paragraph"}]}`,
+        seo: { title: `${nameEn} Category` },
+        privateMetadata: [{ key: 'jolar', value: og }],
       },
-      parent: null, // Set to null if no parent category
+      parent: parent ? getCatId(parent) : null, // Set to null if no parent category
     };
 
     try {
@@ -152,105 +186,25 @@ async function createCategories(categories) {
       const variablesTr = {
         id: response.categoryCreate.category.id, // Use the ID from the category creation response
         input: {
-          name: nameEn, // Use the ID from the category creation response
-          seoTitle: `${nameEn} Category`, // Use the English name from the category data
-          description: `{"blocks": [{"data": {"text": "Description for ${nameEn}."}, "type": "paragraph"}]}`,
+          name: nameFr, // Use the ID from the category creation response
+          seoTitle: `${nameFr} Category`, // Use the English name from the category data
+          description: `{"blocks": [{"data": {"text": "Description pour ${nameFr}."}, "type": "paragraph"}]}`,
         },
-        languageCode: 'EN',
+        languageCode: 'FR',
       };
       const responseTr = await executeGraphQL(queryTr, {
         variables: variablesTr,
       });
-      console.log(`Category ${nameFr} created successfully` /* response */);
+      console.log(`Category ${nameEn} created successfully` /* response */);
     } catch (error) {
-      console.error(`Error creating category ${nameFr}:`, error);
-      break; // Stop on error to avoid overwhelming the server
-    }
-  }
-}
-
-async function createSubCategories(subCategories) {
-  for (const category of subCategories) {
-    const { fr: nameFr, en: nameEn, og: og } = category;
-
-    const parentId = jolarCategoryId;
-
-    const queryCat = `
-      mutation CreateCategory($input: CategoryInput!, $parent: ID) {
-        categoryCreate(input: $input, parent: $parent) {
-          category {
-            id
-            name
-            slug
-            parent { 
-              id 
-              name 
-            }
-          }
-          errors {
-            field
-            message
-            attributes
-            code
-            values
-          }
-        }
-      }
-    `;
-    const queryTr = `
-       mutation TranslateCategory($id: ID!,$input: TranslationInput!, $languageCode: LanguageCodeEnum!) {
-          categoryTranslate(id: $id, input: $input, languageCode: $languageCode) {
-            category {
-              id 
-            }
-            errors {
-              field
-              message
-              code
-            }
-          }
-        }
-      `;
-    const variablesCat = {
-      input: {
-        name: nameFr,
-        slug: slug(nameFr),
-        description: `{"blocks": [{"data": {"text": "Description pour ${nameFr}."}, "type": "paragraph"}]}`,
-        seo: { title: `Categorie ${nameFr}` },
-
-        privateMetadata: [{ key: 'jolar', value: og }],
-      },
-      parent: parentId, // Set to null if no parent category
-    };
-
-    try {
-      const responseCat = await executeGraphQL(queryCat, {
-        variables: variablesCat,
-      });
-      // console.log(responseCat.categoryCreate.errors);
-      // exit();
-      const variablesTr = {
-        id: responseCat.categoryCreate.category.id, // Use the ID from the category creation response
-        input: {
-          name: nameEn, // Use the ID from the category creation response
-          seoTitle: `${nameEn} Category`, // Use the English name from the category data
-          description: `{"blocks": [{"data": {"text": "Description for ${nameEn}."}, "type": "paragraph"}]}`,
-        },
-        languageCode: 'EN',
-      };
-      const responseTr = await executeGraphQL(queryTr, {
-        variables: variablesTr,
-      });
-      console.log(`SubCategory ${nameFr} created successfully` /* response */);
-    } catch (error) {
-      console.error(`Error creating category ${nameFr}:`, error);
+      console.error(`Error creating category ${nameEn}:`, error);
       break; // Stop on error to avoid overwhelming the server
     }
   }
 }
 
 async function createCollections(collections) {
-  const channelID = await fetchChannel('Default Channel');
+  const channelID = await fetchChannel('default-channel');
 
   for (const collection of collections) {
     const { en: nameEn, fr: nameFr, og: og } = collection;
@@ -288,11 +242,12 @@ async function createCollections(collections) {
       `;
     const variables = {
       input: {
-        name: nameFr,
-        slug: slug(nameFr),
-        description: `{"blocks": [{"data": {"text": "Description pour ${nameFr}."}, "type": "paragraph"}]}`,
-        seo: { title: `Collection ${nameFr}` },
+        name: nameEn,
+        slug: slug(nameEn),
+        description: `{"blocks": [{"data": {"text": "Description for ${nameEn}."}, "type": "paragraph"}]}`,
+        seo: { title: `${nameEn} Collection` },
         privateMetadata: [{ key: 'jolar', value: og }],
+        metadata: [{ key: 'type', value: 'supplier' }],
       },
     };
 
@@ -302,11 +257,11 @@ async function createCollections(collections) {
       const variablesTr = {
         id: response.collectionCreate.collection.id,
         input: {
-          name: nameEn, // Use the ID from the category creation response
-          seoTitle: `${nameEn} Collection`, // Use the English name from the category data
-          description: `{"blocks": [{"data": {"text": "Description for ${nameEn}."}, "type": "paragraph"}]}`,
+          name: nameFr, // Use the ID from the category creation response
+          seoTitle: `Collection ${nameFr}`, // Use the English name from the category data
+          description: `{"blocks": [{"data": {"text": "Description pour ${nameFr}."}, "type": "paragraph"}]}`,
         },
-        languageCode: 'EN',
+        languageCode: 'FR',
       };
 
       const responseTr = await executeGraphQL(queryTr, {
@@ -322,7 +277,7 @@ async function createCollections(collections) {
         channelID
       );
     } catch (error) {
-      console.error(`Error creating collection ${nameFr}:`, error);
+      console.error(`Error creating collection ${nameEn}:`, error);
       throw error; // Stop on error to avoid overwhelming the server
     }
   }

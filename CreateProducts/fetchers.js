@@ -12,8 +12,12 @@ export async function fetchCategories() {
             parent {
               id
             }
+            level
             nopId: privateMetafield(key: "nopId")
             jolar: privateMetafield(key: "jolar")
+            translation(languageCode: FR) {
+              name
+            }
           }
         }
       }
@@ -26,7 +30,7 @@ export async function fetchCategories() {
 export async function fetchCategoryTree() {
   const query = `
 {
-  categories(first: 100, level: 0) {
+  categories(first: 10, level: 0) {
     edges {
       node {
         id
@@ -35,10 +39,10 @@ export async function fetchCategoryTree() {
         nopId: privateMetafield(key: "nopId")
         jolar: privateMetafield(key: "jolar")
         level
-        translation(languageCode: EN) {
+        translation(languageCode: FR) {
           name
         }
-        children(first: 100) {
+        children(first: 10) {
           edges {
             node {
               id
@@ -47,8 +51,23 @@ export async function fetchCategoryTree() {
               nopId: privateMetafield(key: "nopId")
               jolar: privateMetafield(key: "jolar")
               level
-              translation(languageCode: EN) {
+              translation(languageCode: FR) {
                 name
+              }
+              children(first: 11) {
+                edges {
+                  node {
+                    id
+                    name
+                    slug
+                    nopId: privateMetafield(key: "nopId")
+                    jolar: privateMetafield(key: "jolar")
+                    level
+                    translation(languageCode: FR) {
+                      name
+                    }
+                  }
+                }  
               }
             }
           }
@@ -62,26 +81,21 @@ export async function fetchCategoryTree() {
   return response.categories.edges.map((edge) => edge.node);
 }
 
-export async function fetchChannel(name) {
+export async function fetchChannel(slug) {
   const query = `
-   query  {
-      channels {
-            id
-            name
-            slug
-            currencyCode
+    query getChannel($slug: String) {
+      channel(slug: $slug) {
+        id
+        name
+        slug
       }
     }
-`;
-  const response = await executeGraphQL(query, {});
-  const channels = response.channels;
-  const channel = channels.find((c) =>
-    c.name.toLowerCase().includes(name.toLowerCase())
-  );
-  return channel?.id;
+  `;
+  const response = await executeGraphQL(query, { variables: { slug } });
+  return response.channel?.id;
 }
 
-export async function fetchMenuId(name) {
+export async function fetchMenuId(slug) {
   const query = `
    query Menu($slug: String) {
       menu(slug: $slug) {
@@ -93,7 +107,7 @@ export async function fetchMenuId(name) {
       }
     }
 `;
-  const response = await executeGraphQL(query, { variables: { slug: name } });
+  const response = await executeGraphQL(query, { variables: { slug } });
 
   return response.menu?.id;
 }
@@ -220,7 +234,8 @@ export async function fetchAllCollections() {
             name
             nopId: privateMetafield(key: "nopId")
             jolar: privateMetafield(key: "jolar")
-            translation(languageCode: EN){
+            type:  metafield(key: "type")
+            translation(languageCode: FR){
               name
             }
           }

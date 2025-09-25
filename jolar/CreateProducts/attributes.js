@@ -1,4 +1,4 @@
-import { executeGraphQL } from './graphql.js';
+import { executeGraphQL } from '../../CreateProducts/graphql.js';
 import 'dotenv/config';
 import { GetDataFromFile } from './excel.js';
 
@@ -31,9 +31,10 @@ const colorList = Object.keys(colors1).map((el, idx) => ({
 }));
 
 //Remplace certaines traductions
-colorList.find((c) => c.en == 'Black-Vintage Rose').fr = 'Noir/Vieux Rose';
-colorList.find((c) => c.en == 'Vintage Rose').fr = 'Rose Vieilli';
-colorList.find((c) => c.en == 'Mauve').fr = 'Mauve.';
+//Seulement utile quand la langue par default est le francais
+// colorList.find((c) => c.en == 'Black-Vintage Rose').fr = 'Noir/Vieux Rose';
+// colorList.find((c) => c.en == 'Vintage Rose').fr = 'Rose Vieilli';
+// colorList.find((c) => c.en == 'Mauve').fr = 'Mauve.';
 
 // console.log('-------------------', colorList.length);
 
@@ -86,7 +87,7 @@ async function createAttributes() {
 
   const size = {
     input: {
-      name: 'Taille',
+      name: 'Size',
       slug: 'size',
       externalReference: 'size',
       type: 'PRODUCT_TYPE',
@@ -96,18 +97,18 @@ async function createAttributes() {
   };
   const color = {
     input: {
-      name: 'Couleur',
+      name: 'Color',
       slug: 'color',
       externalReference: 'color',
       type: 'PRODUCT_TYPE',
       inputType: 'DROPDOWN', // or "TEXT", "BOOLEAN", etc.
       isVariantOnly: true,
-      values: colorList.map((c) => ({ name: c.fr, externalReference: c.id })),
+      values: colorList.map((c) => ({ name: c.en, externalReference: c.id })),
     },
   };
   const fabric = {
     input: {
-      name: 'Tissu',
+      name: 'Fabric',
       slug: 'fabric',
       externalReference: 'fabric',
       type: 'PRODUCT_TYPE',
@@ -115,7 +116,7 @@ async function createAttributes() {
     },
   };
 
-  async function createAttribute(variables, enName) {
+  async function createAttribute(variables, frName) {
     const result = await executeGraphQL(mutation, { variables: variables });
 
     const metaVar = {
@@ -127,13 +128,13 @@ async function createAttributes() {
 
     const transVar = {
       id: result.attributeCreate.attribute.id,
-      input: { name: enName },
-      languageCode: 'EN',
+      input: { name: frName },
+      languageCode: 'FR',
     };
 
     //if color
-    if (enName == 'Color') {
-      addEnglishColors(result.attributeCreate.attribute.id);
+    if (frName == 'Couleur') {
+      addFrenchColors(result.attributeCreate.attribute.id);
     }
 
     const transResult = await executeGraphQL(transMutation, {
@@ -143,10 +144,10 @@ async function createAttributes() {
     return result.attributeCreate.attribute.id;
   }
 
-  const sizeId = await createAttribute(size, 'Size');
+  const sizeId = await createAttribute(size, 'Taille');
 
-  const colorId = await createAttribute(color, 'Color');
-  const fabricId = await createAttribute(fabric, 'Fabric');
+  const colorId = await createAttribute(color, 'Couleur');
+  const fabricId = await createAttribute(fabric, 'Tissu');
 
   return {
     productAttributes: [fabricId],
@@ -217,11 +218,11 @@ async function createProductType(name, slug, attributeList, variantList) {
   await executeGraphQL(mutation2, { variables: variables2 });
 }
 
-async function addEnglishColors() {
+async function addFrenchColors() {
   const colors = colorList.map((c) => ({
     externalReference: c.id,
-    languageCode: 'EN',
-    translationFields: { name: c.en },
+    languageCode: 'FR',
+    translationFields: { name: c.fr },
   }));
   const mutation = `
     mutation BulkTranslateAttributeValue($errorPolicy: ErrorPolicyEnum, $translations: [AttributeValueBulkTranslateInput!]!){
@@ -247,10 +248,10 @@ async function addEnglishColors() {
 
 const res = await createAttributes();
 createProductType(
-  'Vêtement',
-  'garment',
+  'Clothing',
+  'clothing',
   res.productAttributes,
   res.variantAttributes
 );
 
-addEnglishColors();
+addFrenchColors();

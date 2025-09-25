@@ -20,7 +20,7 @@ const sqlconn_string = process.env.sqlconn_string;
 const productType = await fetchProductType('Default Type');
 const categories = await fetchAllCategories();
 const collections = await fetchAllCollections();
-const channelID = await fetchChannel('Default Channel'); // Assuming a default channel ID for simplicity
+const channelID = await fetchChannel('default-channel'); // Assuming a default channel ID for simplicity
 const warehouseID = await fetchWarehouse('Default'); // Assuming a default warehouse ID for simplicity
 
 console.log('Using channel ID:', channelID);

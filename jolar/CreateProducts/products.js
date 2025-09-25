@@ -1,8 +1,7 @@
-import { executeGraphQL } from './graphql.js';
 import slug from 'slug';
 import 'dotenv/config';
-import XLSX from 'xlsx';
 import fs from 'fs';
+import { executeGraphQL } from '../../CreateProducts/graphql.js';
 import {
   fetchProductType,
   fetchAllCategories,
@@ -10,26 +9,27 @@ import {
   fetchWarehouse,
   fetchAllCollections,
   fetchAllAttributes,
-} from './fetchers.js';
+} from '../../CreateProducts/fetchers.js';
+
+import { GetDataFromFile } from './excel.js';
 
 const importImages = true;
 const productMin = readPositionFromFile();
 const productMax = null;
 
-const rawMap = fs.readFileSync('productMap.json', 'utf-8');
-const mapping = JSON.parse(rawMap);
+const namesMap = fs.readFileSync('productNames.json', 'utf-8');
+const mapping = JSON.parse(namesMap);
 
-const rawPictures = fs.readFileSync('productPhotos.json', 'utf-8');
-const mappingPhotos = JSON.parse(rawPictures);
-
-const jsonData = GetDataFromFile('./data2.xlsx');
-
-const jsonRef = GetDataFromFile('./dataRef.xlsx');
+const jsonData = GetDataFromFile('./data1.xlsx');
 
 // the main list keeps products that have more than 20 items, have a price and are not discontinued
 
 const mainList = jsonData.filter(
-  (p) => p['AT Ship'] >= 20 && p.Discontinued == 0 && p.Price > 0
+  (p) =>
+    p['AT Ship'] >= 20 &&
+    p.Discontinued == 0 &&
+    p.Price > 0 &&
+    p.PType != 'Supply'
   // p.PGroup != 'Discontinué' &&
   // p.PGroup != 'Disc'
 );
@@ -47,31 +47,21 @@ const mainListWithVariants = jsonData.filter(
     uniqueProducts.includes(p.Product) &&
     p.Discontinued == 0 &&
     p.Price > 0 &&
-    p['AT Ship'] >= 6
+    p.PType != 'Supply' &&
+    p['AT Ship'] >= 1 &&
+    p.Product != 'DG0233' // this product was removed from internet (no link found on search results page)
 );
 
-showCount('variants keeping similar variants >= 6', mainListWithVariants);
+fixList(mainListWithVariants);
 
-const bigMainList = mainListWithVariants.map((el) => {
-  const refer = jsonRef.find(
-    (r) =>
-      r.Product == el.Product &&
-      r.Color == el.Color &&
-      r['Size Code'] == el.SizeRun &&
-      lookupCat(r.Cat) == el.Cat &&
-      !r['Publish To Web'] == el.Discontinued
-  );
-  if (!refer) {
-    console.error(`ERROR Referrence ${el.Product}`);
-  }
-  return { ...refer, ...el };
-});
+showCount('variants keeping similar variants >= 1', mainListWithVariants);
 
-const productType = await fetchProductType('Vêtement');
+const productType = await fetchProductType('clothing');
+
 const categories = await fetchAllCategories();
 const collections = await fetchAllCollections();
 const attributes = await fetchAllAttributes();
-const channelID = await fetchChannel('Default Channel'); // Assuming a default channel ID for simplicity
+const channelID = await fetchChannel('default-channel'); // Assuming a default channel ID for simplicity
 const warehouseID = await fetchWarehouse('Default'); // Assuming a default warehouse ID for simplicity
 
 console.log('Using channel ID:', channelID);
@@ -85,159 +75,223 @@ console.log('Using warehouse ID:', warehouseID);
 
 //await createPicturesFile(bigMainList);
 
-await createProducts(bigMainList);
+await createProducts(mainListWithVariants);
 
 //console.log(await getPictureList('FE12577'));
 
-async function getPictureList(product) {
-  const map = mapping.find(
-    (m) => m.prod.toLowerCase() == product.toLowerCase()
+async function GetDataFromInternet(productStr) {
+  // console.log(productStr);
+
+  if (productStr == 'ML50024Q') {
+    productStr = 'ML50024X';
+  }
+
+  const result = await fetch(
+    `https://www.jolarspeck.com/en/catalogsearch/result/?q=${productStr}`
   );
-  let newLink;
-  if (map) newLink = map.newLink;
-  else
-    newLink = slug(
-      product +
-        ' ' +
-        stripPromo(bigMainList.find((p) => p.Product == product)['Description'])
-    );
+  const html1 = await result.text();
 
-  const resp = await fetch(`https://www.jolarspeck.com/en/${newLink}`);
-  const html = await resp.text();
+  const regex = /product-top.*?href="(.+?)"/g;
+  let match;
+  const urls = [];
 
-  const regex = /data-zoom="(.*?)"/g;
-  let match = {};
+  while ((match = regex.exec(html1)) !== null) {
+    urls.push(match[1]);
+  }
+  let theLink = urls.find((u) => u.includes(productStr));
+  if (!theLink) {
+    theLink = urls[0];
+    if (!theLink) {
+      console.error('No link found for', productStr);
+    }
+  }
+
+  const enLink = theLink;
+  const frLink = theLink.replace('/en/', '/fr/');
+
+  const enResp = await fetch(enLink);
+  const frResp = await fetch(frLink);
+  const html = await enResp.text();
+  const frHtml = await frResp.text();
+
+  const regex2 = /data-zoom="(.*?)"/g;
+  match = undefined;
   const photos = [];
 
-  while ((match = regex.exec(html)) !== null) {
+  while ((match = regex2.exec(html)) !== null) {
     photos.push(match[1]);
   }
-  return photos;
+
+  const regex3 =
+    /itemprop="description">\s*(.*?)\s*<\/div><\/div>   <div class="product-sub-infomation /gms;
+  match = undefined;
+  let description = [];
+
+  while ((match = regex3.exec(html)) !== null) {
+    description.push(match[1]);
+  }
+  while ((match = regex3.exec(frHtml)) !== null) {
+    description.push(match[1]);
+  }
+
+  if (description[0] == description[1]) {
+    //if not translated, just keep the english one
+    description = [description[0]];
+  }
+
+  const regex4 = /data-th="Composition">(.*?)<\/td>/;
+  match = regex4.exec(frHtml);
+  const compositionFr = match ? match[1] : null;
+  match = regex4.exec(html);
+  const compositionEn = match ? match[1] : null;
+  if (compositionEn !== compositionFr) {
+    console.log(compositionEn);
+  }
+  return {
+    photos,
+    descriptionEn: description[0],
+    descriptionFr: description[1],
+    compositionEn,
+    compositionFr,
+  };
 }
+
+// async function getPictureList(product) {
+//   const map = mapping.find(
+//     (m) => m.prod.toLowerCase() == product.toLowerCase()
+//   );
+//   let newLink;
+//   if (map) newLink = map.newLink;
+//   else
+//     newLink = slug(
+//       product +
+//         ' ' +
+//         stripPromo(bigMainList.find((p) => p.Product == product)['Description'])
+//     );
+
+//   const resp = await fetch(`https://www.jolarspeck.com/en/${newLink}`);
+//   const html = await resp.text();
+
+//   const regex = /data-zoom="(.*?)"/g;
+//   let match = {};
+//   const photos = [];
+
+//   while ((match = regex.exec(html)) !== null) {
+//     photos.push(match[1]);
+//   }
+//   return photos;
+// }
 
 // function listProductsWithDash(){
 //   const products = bigMainList.filter((p) => p.Product.includes('-'));
 //   console.log(products.map((p) => p.Product));
 // }
-async function createBadLinksFile() {
-  const grouped2 = Object.groupBy(bigMainList, (p) => p.Product);
-  const prods = Object.keys(grouped2).map((key) => ({
-    ...grouped[key][0],
-    variants: grouped[key],
-  }));
 
-  const mylist = prods.map((p) =>
-    slug(p.Product + ' ' + stripPromo(p['Description']))
-  );
+// async function createBadLinksFile() {
+//   const grouped2 = Object.groupBy(bigMainList, (p) => p.Product);
+//   const prods = Object.keys(grouped2).map((key) => ({
+//     ...grouped[key][0],
+//     variants: grouped[key],
+//   }));
 
-  const fetchPromises = mylist.map((url) =>
-    fetch(`https://www.jolarspeck.com/en/${url}`)
-  );
-  const responses = await Promise.all(fetchPromises);
-  const data = responses.map((response) => {
-    let r;
-    if (!response.ok) {
-      r = { link: response.url.split('/').pop(), status: response.status };
-    } else {
-      r = { link: response.url.split('/').pop(), status: 'OK' };
-    }
-    return r;
-  });
+//   const mylist = prods.map((p) =>
+//     slug(p.Product + ' ' + stripPromo(p['Description']))
+//   );
 
-  console.log('number of errors:', data.filter((d) => d.status != 'OK').length);
-  fs.writeFileSync(
-    'out.txt',
-    JSON.stringify(
-      data.filter((d) => d.status != 'OK'),
-      null,
-      2
-    )
-  );
-}
+//   const fetchPromises = mylist.map((url) =>
+//     fetch(`https://www.jolarspeck.com/en/${url}`)
+//   );
+//   const responses = await Promise.all(fetchPromises);
+//   const data = responses.map((response) => {
+//     let r;
+//     if (!response.ok) {
+//       r = { link: response.url.split('/').pop(), status: response.status };
+//     } else {
+//       r = { link: response.url.split('/').pop(), status: 'OK' };
+//     }
+//     return r;
+//   });
 
-async function fixBadLinksFiles() {
-  const links = JSON.parse(fs.readFileSync('out.txt', 'utf-8'));
-  const myLinks = links.map((l) => {
-    let prod = l.link.split('-')[0];
-    if (l.link.split('-')[1] == 'p' && prod == 'ml1783') prod = 'ml1783-p';
-    if (prod == 'ml50024q') prod = 'ml50024x';
-    return { prod, link: l.link };
-  });
+//   console.log('number of errors:', data.filter((d) => d.status != 'OK').length);
+//   fs.writeFileSync(
+//     'out.txt',
+//     JSON.stringify(
+//       data.filter((d) => d.status != 'OK'),
+//       null,
+//       2
+//     )
+//   );
+// // }
 
-  const fetchPromises = myLinks.map((l) =>
-    fetch(`https://www.jolarspeck.com/en/catalogsearch/result/?q=${l.prod}`)
-  );
+// async function fixBadLinksFiles() {
+//   const links = JSON.parse(fs.readFileSync('out.txt', 'utf-8'));
+//   const myLinks = links.map((l) => {
+//     let prod = l.link.split('-')[0];
+//     if (l.link.split('-')[1] == 'p' && prod == 'ml1783') prod = 'ml1783-p';
+//     if (prod == 'ml50024q') prod = 'ml50024x';
+//     return { prod, link: l.link };
+//   });
 
-  const responses = await Promise.all(fetchPromises);
+//   const fetchPromises = myLinks.map((l) =>
+//     fetch(`https://www.jolarspeck.com/en/catalogsearch/result/?q=${l.prod}`)
+//   );
 
-  for (let i = 0; i < responses.length; i++) {
-    //responses.forEach(async (r, idx) => {
-    const html = await responses[i].text();
-    const regex = /product-top.*?href="(.+?)"/g;
-    let match;
-    const urls = [];
+//   const responses = await Promise.all(fetchPromises);
 
-    while ((match = regex.exec(html)) !== null) {
-      urls.push(match[1]);
-    }
-    const prod = responses[i].url.split('=').pop();
-    let theLink = urls.find((u) => {
-      const res = u.includes(prod);
-      return res;
-    });
-    if (theLink == undefined) {
-      theLink = urls[0];
-      if (theLink == undefined) {
-        console.error('No link found for', prod);
-        continue;
-      }
-    }
+//   // Cannot use forEach with async/await
+//   //responses.forEach(async (r, idx) => {
+//   for (let i = 0; i < responses.length; i++) {
+//     // get the url of every link after the div with class="product-top"
+//     const html = await responses[i].text();
+//     const regex = /product-top.*?href="(.+?)"/g;
+//     let match;
+//     const urls = [];
 
-    myLinks[i].newLink = theLink.split('/').pop();
-  }
-  //console.log(myLinks);
-  fs.writeFileSync('productMap.json', JSON.stringify(myLinks, null, 2));
-  console.log(myLinks.length);
-  return myLinks;
-}
+//     while ((match = regex.exec(html)) !== null) {
+//       urls.push(match[1]);
+//     }
+//     const prod = responses[i].url.split('=').pop();
+//     let theLink = urls.find((u) => {
+//       const res = u.includes(prod);
+//       return res;
+//     });
+//     if (theLink == undefined) {
+//       theLink = urls[0];
+//       if (theLink == undefined) {
+//         console.error('No link found for', prod);
+//         continue;
+//       }
+//     }
 
-async function createPicturesFile(products) {
-  const grouped = Object.groupBy(products, (p) => p.Product);
-  const prods = Object.keys(grouped).map((key) => ({
-    ...grouped[key][0],
-    variants: grouped[key],
-  }));
+//     myLinks[i].newLink = theLink.split('/').pop();
+//   }
+//   //console.log(myLinks);
+//   fs.writeFileSync('productMap.json', JSON.stringify(myLinks, null, 2));
+//   console.log(myLinks.length);
+//   return myLinks;
+// // }
 
-  let listProductPhotos = [];
+// async function createPicturesFile(products) {
+//   const grouped = Object.groupBy(products, (p) => p.Product);
+//   const prods = Object.keys(grouped).map((key) => ({
+//     ...grouped[key][0],
+//     variants: grouped[key],
+//   }));
 
-  for (const p of prods) {
-    const images = (await getPictureList(p.Product)).map((pic, num) => ({
-      alt: (p.Description ?? p['Description 2']) + ' ' + (num + 1),
-      mediaUrl: pic,
-    }));
-    listProductPhotos.push({ product: p.Product, images });
-  }
-  fs.writeFileSync(
-    'productPhotos.json',
-    JSON.stringify(listProductPhotos, null, 2)
-  );
-}
+//   let listProductPhotos = [];
 
-function GetDataFromFile(file) {
-  // 1. Specify the path to your Excel file
-  const excelFile = file;
-
-  // 2. Read the workbook
-  const workbook = XLSX.readFile(excelFile);
-
-  // 3. Get the name of the first sheet
-  const sheetName = workbook.SheetNames[0];
-
-  // 4. Get the worksheet
-  const worksheet = workbook.Sheets[sheetName];
-
-  return XLSX.utils.sheet_to_json(worksheet, { defval: null });
-}
+//   for (const p of prods) {
+//     const images = (await getPictureList(p.Product)).map((pic, num) => ({
+//       alt: (p.Description ?? p['Description 2']) + ' ' + (num + 1),
+//       mediaUrl: pic,
+//     }));
+//     listProductPhotos.push({ product: p.Product, images });
+//   }
+//   fs.writeFileSync(
+//     'productPhotos.json',
+//     JSON.stringify(listProductPhotos, null, 2)
+//   );
+// }
 
 function readPositionFromFile() {
   let productMin = 0;
@@ -260,71 +314,93 @@ async function createProducts(products) {
     variants: grouped[key],
   }));
 
-  const listProducts = prods.map((p) => ({
-    name: p['Description 2'],
-    productType: productType,
-    attributes: [{ externalReference: 'fabric', plainText: p.Composition }],
-
-    category: lookupCategory(p['Type Group']),
-    collections: [lookupCollection(p.PType), lookupCollection(p.ProductClass)], // Add collections if needed
-    media: mappingPhotos.find((m) => m.product == p.Product)?.images,
-    slug: slug(p.Product),
-
-    description: `{"blocks": [{"data": {"text": "Description pour ${p[
-      'Description 2'
-    ].replace(/"/g, '\\"')}."}, "type": "paragraph"}]}`,
-    privateMetadata: [{ key: 'jolar', value: p.Product }],
-    metadata: [
-      {
-        key: 'mdxFr',
-        value: '<div>\n' + p['Web Description 2'] + '\n</div>',
-      },
-      { key: 'mdxEn', value: '<div>\n' + p['Web Description'] + '\n</div>' },
-    ],
-
-    externalReference: p.Product,
-    channelListings: [
-      {
-        channelId: channelID,
-        isPublished: true,
-        visibleInListings: true,
-        isAvailableForPurchase: true,
-      },
-    ],
-    variants: p.variants.map((v) => ({
+  const promises = prods.map(async (p) => {
+    const prodData = await GetDataFromInternet(p.Product);
+    const prodNames = lookupName(p.Product);
+    return {
+      name: prodNames.en,
+      productType: productType, // clothing for everything
       attributes: [
-        { externalReference: 'size', plainText: v.Size },
-        { externalReference: 'color', dropdown: { value: v.Color } },
+        {
+          externalReference: 'fabric',
+          plainText: prodData.compositionEn ?? prodNames.fabric,
+        },
       ],
-      sku:
-        v.UPC ?? v.EAN ?? 'xxx' + Math.random().toString(36).substring(2, 15),
-      name: v.Color + ' - ' + v.Size,
-      //externalReference: p.pvId,
-      metadata: v.UPC ? [{ key: 'upc', value: v.UPC }] : undefined,
-      stocks: [{ warehouse: warehouseID, quantity: v['AT Ship'] }],
+
+      category: lookupCategory(p.PType),
+      collections: [lookupCollection(p.ProductClass)], // Add a collection for the manufacturer
+      media: prodData.photos.map((url, index) => ({
+        alt: prodNames.en + ' ' + (index + 1),
+        mediaUrl: url,
+      })),
+      slug: slug(p.Product),
+
+      description: `{"blocks": [{"data": {"text": "Description for ${
+        prodNames.en.replace(/"/g, '\\"') // replace quotes to avoid JSON issues
+      }."}, "type": "paragraph"}]}`,
+      privateMetadata: [{ key: 'jolar', value: p.Product }],
+
+      metadata: [
+        {
+          key: 'mdxFr',
+          value: prodData.descriptionFr ?? prodData.descriptionEn,
+        },
+        { key: 'mdxEn', value: prodData.descriptionEn },
+      ],
+
+      externalReference: p.Product,
       channelListings: [
         {
           channelId: channelID,
-          price: p.Price * 2,
-          costPrice: p.Price,
+          isPublished: true,
+          visibleInListings: true,
+          isAvailableForPurchase: true,
         },
       ],
-    })),
-  }));
+      variants: p.variants.map((v) => ({
+        attributes: [
+          { externalReference: 'size', plainText: v.Size },
+          { externalReference: 'color', dropdown: { value: v.Color } },
+        ],
+        sku: v.UPC ?? v.EAN ?? v.Product + v.Size + v.Color,
+        externalReference: v.UPC ?? v.EAN ?? v.Product + v.Size + v.Color,
+        name: v.Color + ' - ' + v.Size,
+        metadata: v.UPC ? [{ key: 'upc', value: v.UPC }] : undefined,
+        stocks: [{ warehouse: warehouseID, quantity: v['AT Ship'] }],
+        channelListings: [
+          {
+            channelId: channelID,
+            price: v.Price * 2,
+            costPrice: v.Price,
+          },
+        ],
+      })),
+    };
+  });
+  console.log(
+    `getting ${promises.length * 2} internet pages for ${
+      promises.length
+    } products`
+  );
+  const listProducts = await Promise.all(promises);
 
-  const listTranslations = prods.map((p) => ({
-    //id: 'asdf',
-    externalReference: p.Product,
-    languageCode: 'EN',
-    translationFields: {
-      name: p['Description 1'],
-      description: `{"blocks": [{"data": {"text": "This is a description for ${p[
-        'Description 1'
-      ].replace(/"/g, '\\"')}."}, "type": "paragraph"}]}`,
-      seoTitle: p['Description 1'],
-      //seoDescription: '',
-    },
-  }));
+  const listTranslations = prods.map((p) => {
+    const prodNames = lookupName(p.Product);
+    return {
+      //id: 'asdf',
+      externalReference: p.Product,
+      languageCode: 'FR',
+      translationFields: {
+        name: prodNames.fr,
+        description: `{"blocks": [{"data": {"text": "Decription pour ${prodNames.fr.replace(
+          /"/g,
+          '\\"'
+        )}."}, "type": "paragraph"}]}`,
+        seoTitle: prodNames.fr,
+        //seoDescription: '',
+      },
+    };
+  });
 
   const query = `
       mutation CreateProduct($errorPolicy: ErrorPolicyEnum, $products: [ProductBulkCreateInput!]!) {
@@ -351,6 +427,13 @@ async function createProducts(products) {
 
   let pos = productMin;
   let maxPos = productMax || listProducts.length;
+
+  if (pos >= maxPos) {
+    console.log(
+      'All products have already been processed in "./currentProductPos.txt"'
+    );
+    return;
+  }
 
   while (pos < maxPos) {
     const batch = listProducts.slice(pos, pos + 10);
@@ -420,20 +503,26 @@ function lookupCollection(og) {
   return id;
 }
 
+function lookupName(productStr) {
+  return mapping.find(
+    (m) => m.product.toLowerCase() == productStr.toLowerCase()
+  );
+}
+
 function showCount(description, array) {
   console.log(description + ':', array.length);
 }
 
-function lookupCat(cat) {
-  if (cat == 'Duty Free') return 'DFR';
-  else return 'REG';
-}
+// function fixCat(cat) {
+//   if (cat == 'Duty Free') return 'DFR';
+//   else return 'REG';
+// }
 
-function lookupAttr(slug) {
-  let attr = null;
-  attr = attributes.find((a) => a.slug == slug);
-  return attr;
-}
+// function lookupAttr(slug) {
+//   let attr = null;
+//   attr = attributes.find((a) => a.slug == slug);
+//   return attr;
+// }
 
 // function lookupProduct(nopId) {
 //   let id = null;
@@ -443,4 +532,12 @@ function lookupAttr(slug) {
 
 function stripPromo(str) {
   return str.replace(/Promo\d\d-/gi, '');
+}
+
+function fixList(list) {
+  const result = list.find((p) => p.EAN == '4711168808204' && !p.UPC);
+  if (result) {
+    result.UPC = '849450065470';
+    console.log('Fixed UPC for', result.Product);
+  }
 }

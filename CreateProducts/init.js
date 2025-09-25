@@ -1,20 +1,20 @@
 import { executeGraphQL } from './graphql.js';
 import { fetchChannel, fetchWarehouse, fetchShip } from './fetchers.js';
 
-const defChannelId = await fetchChannel('Default Channel');
-let channelId = await fetchChannel('Default Channel');
+const defChannelId = await fetchChannel('default-channel');
+let channelId;
 const shipId = await fetchShip('Default');
 const warehouseId = await fetchWarehouse('Default');
 
 //let's delete the old default channel if it's already there
 if (defChannelId) {
-  const result = await deleteChannel(channelId);
+  const result = await deleteChannel(defChannelId);
   console.log('Delete channel result: %o', result);
 }
 
 //Let's create a new default channel
 //with canadian money, using the default shipping and the default warehouse
-channelId = await fetchChannel('Default Channel');
+channelId = await fetchChannel('default-channel');
 if (!channelId) {
   const res2 = await createDefaultChannel();
   console.log('Create channel result: %o', res2);
@@ -24,6 +24,9 @@ if (!channelId) {
 const res3 = await updateShipping(shipId, warehouseId);
 
 console.log('Update shipping result: %o', res3);
+
+await createTVQ();
+await createGST();
 
 async function deleteChannel(channelId) {
   const query = `
@@ -114,4 +117,71 @@ async function updateShipping(shipId, warehouseId) {
     console.error('Error updating shipping zone:', error);
     throw error; // Re-throw the error for further handling if needed
   }
+}
+
+async function createGST() {
+  const query = `
+   mutation UpdateTaxCountryConfiguration($countryCode: CountryCode!, $updateTaxClassRates: [TaxClassRateInput!]! ) {
+    taxCountryConfigurationUpdate(countryCode: $countryCode, updateTaxClassRates: $updateTaxClassRates) {
+      taxCountryConfiguration{
+        country{
+          country
+        }
+        taxClassCountryRates{
+          rate
+        }
+      }
+      errors {
+        field
+        message
+        code
+      }
+    }
+  }
+    `;
+  const variables = {
+    countryCode: 'CA',
+    updateTaxClassRates: [{ rate: '5.0' }],
+  };
+  const response = await executeGraphQL(query, { variables });
+  console.log(response);
+  return response;
+}
+
+async function createTVQ() {
+  const query = `
+   mutation CreateTaxClass( $input: TaxClassCreateInput!) {
+    taxClassCreate(input: $input) {
+      taxClass{
+        id
+        name
+        countries{
+          country{
+            code 
+            country
+          }
+          rate
+          taxClass {
+            id
+            name
+          }
+        }
+      }
+      errors {
+        field
+        message
+        code
+      }
+    }
+  }
+    `;
+  const variables = {
+    input: {
+      name: 'TVQ',
+      createCountryRates: [{ countryCode: 'CA', rate: '9.975' }],
+    },
+  };
+  const response = await executeGraphQL(query, { variables });
+  console.log(response);
+  return response;
 }
