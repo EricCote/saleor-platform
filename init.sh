@@ -9,8 +9,8 @@ docker compose run --rm api python3 manage.py createsuperuser --no-input
 #docker compose up api -d
 #docker compose build storefront
 #docker compose run --rm storefront sh -c "HUSKY=0 COREPACK_ENABLE_DOWNLOAD_PROMPT=0 pnpm install"
+#docker compose down 
 
-docker compose down 
 docker compose up api -d
 docker compose build --no-cache storefront_prod
 
@@ -42,5 +42,7 @@ node attributes.js
 node categories.js
 node menus.js
 node products.js
+node syncStocks.js data2.xlsx
+node syncStocks.js data3.xlsx
 node featured.js
 
