@@ -42,6 +42,12 @@ const level3 = [
   { fr: 'Bas Jarretelles', en: 'Thigh Hi', og: 'Thigh Hi', parent: 'Hosiery' },
   { fr: 'Bas Culottes', en: 'Pantyhose', og: 'Pantyhose', parent: 'Hosiery' },
   {
+    fr: 'Bas Cheville',
+    en: 'Ankle Hi',
+    og: 'Ankle Hi',
+    parent: 'Hosiery',
+  },
+  {
     fr: 'Bodystocking',
     en: 'Bodystocking',
     og: 'Bodystocking',
@@ -187,7 +193,7 @@ async function createCategories(categories) {
         id: response.categoryCreate.category.id, // Use the ID from the category creation response
         input: {
           name: nameFr, // Use the ID from the category creation response
-          seoTitle: `${nameFr} Category`, // Use the English name from the category data
+          seoTitle: `Catégorie ${nameFr}`, // Use the English name from the category data
           description: `{"blocks": [{"data": {"text": "Description pour ${nameFr}."}, "type": "paragraph"}]}`,
         },
         languageCode: 'FR',
