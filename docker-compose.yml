@@ -108,7 +108,7 @@ services:
     networks:
       - saleor-backend-tier
     volumes:
-      - saleor-db:/var/lib/postgresql/data
+      - saleor-db:/var/lib/postgresql
       - ./replica_user.sql:/docker-entrypoint-initdb.d/replica_user.sql:ro,z
     secrets:
       - postgres_password
