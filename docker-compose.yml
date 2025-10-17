@@ -162,7 +162,7 @@ services:
       - CELERY_BROKER_URL=redis://redis:6379/1
       - FLOWER_UNAUTHENTICATED_API=true
     networks: 
-      - saleor-backend-tier 
+      - saleor-backend-tier
     ports: 
       - "5555:5555"
 
