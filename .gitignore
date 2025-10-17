@@ -1,6 +1,7 @@
 
 
 *.env
+dump.sql
 
 /.pnp
 .pnp.js
