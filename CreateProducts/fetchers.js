@@ -142,6 +142,36 @@ export async function fetchProductType(name) {
   }
 }
 
+export async function fetchAttribute(name) {
+  const query = `
+    query ($filter: AttributeFilterInput) {
+      attributes(first: 1, filter: $filter) {
+        edges {
+          node {
+            id
+            name
+            slug
+            jolar: privateMetafield(key: "jolar")
+            sd: privateMetafield(key: "sd")
+          }
+        }
+      }
+    }
+  `;
+  const variables = {
+    filter: { search: name },
+  };
+
+  const result = await executeGraphQL(query, { variables });
+
+  let id;
+  try {
+    id = result.attributes.edges[0].node.id;
+  } finally {
+    return id;
+  }
+}
+
 export async function fetchAllProductTypesExcept(slug) {
   const query = `
     query{

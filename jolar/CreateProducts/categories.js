@@ -11,7 +11,7 @@ import {
 const level1 = [{ fr: 'Jolar', en: 'Jolar', og: 'Jolar' }];
 
 const level2 = [
-  { fr: 'Lingerie .', en: 'Lingerie', og: 'Lingerie', parent: 'Jolar' },
+  { fr: 'Lingerie', en: 'Lingerie', og: 'Lingerie', parent: 'Jolar' },
   { fr: 'Bas', en: 'Hosiery', og: 'Hosiery', parent: 'Jolar' },
   { fr: 'Costumes', en: 'Costumes', og: 'Costume', parent: 'Jolar' },
   { fr: 'Accessoires', en: 'Accessories', og: 'Accessorie', parent: 'Jolar' },

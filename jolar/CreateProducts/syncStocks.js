@@ -114,6 +114,8 @@ const existingVariants = await getExistingSaleorVariants();
 
 await updateStocks(mainListWithVariants);
 
+await createMissingVariantTranslations();
+
 function findRemovedProducts(existingProducts, groupedProducts) {
   const removedProducts = existingProducts.filter(
     (ep) => !groupedProducts.find((gp) => gp.product == ep.externalReference)
@@ -496,8 +498,6 @@ async function checkVariantExistance(variants) {
   }
 }
 
-async function updateStock(variant) {}
-
 async function createVariants(product) {
   const mutation = `
     mutation CreateProductVariant($errorPolicy: ErrorPolicyEnum, $product: ID!, $variants: [ProductVariantBulkCreateInput!]!) {
@@ -523,7 +523,7 @@ async function createVariants(product) {
 
   const variantList = product.variants.map((v) => ({
     attributes: [
-      { externalReference: 'size', plainText: v.Size },
+      { externalReference: 'size', dropdown: { value: v.Size } },
       { externalReference: 'color', dropdown: { value: v.Color } },
     ],
     sku: v.UPC ?? v.EAN ?? v.Product + v.Size + v.Color,
@@ -569,7 +569,10 @@ async function createProduct(prod) {
       ],
 
       category: lookupCategory(p.variants[0].PType),
-      collections: [lookupCollection(p.variants[0].ProductClass)], // Add a collection for the manufacturer
+      collections: [
+        lookupCollection(p.variants[0].ProductClass),
+        lookupCollection('Unvalidated'),
+      ], // Add a collection for the manufacturer, and to "unvalidated"
       media: prodData.photos.map((url, index) => ({
         alt: prodNames.en + ' ' + (index + 1),
         mediaUrl: url,
@@ -593,7 +596,7 @@ async function createProduct(prod) {
       channelListings: [
         {
           channelId: channelID,
-          isPublished: true,
+          isPublished: false,
           visibleInListings: true,
           isAvailableForPurchase: true,
         },
@@ -602,7 +605,7 @@ async function createProduct(prod) {
         .filter((v) => v['AT Ship'] > 0)
         .map((v) => ({
           attributes: [
-            { externalReference: 'size', plainText: v.Size },
+            { externalReference: 'size', dropdown: { value: v.Size } },
             { externalReference: 'color', dropdown: { value: v.Color } },
           ],
           sku: v.UPC ?? v.EAN ?? v.Product + v.Size + v.Color,
@@ -681,6 +684,106 @@ async function createProduct(prod) {
   const resultTr = await executeGraphQL(mutationTr, { variables: variablesTr });
   totalCreateProduct++;
   console.log('Created product:', p.product, prodNames.en, prodNames.fr);
+}
+
+async function createMissingVariantTranslations() {
+  const query = `
+    query GetAllProductVariants($first: Int!, $after: String) {
+      productVariants(first: $first, after: $after, where: {}) {
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
+        edges {
+          node {
+            id
+            name
+            fr: translation(languageCode: FR) {
+              name
+            }
+            externalReference
+            sku
+            assignedAttributes {
+              ... on AssignedSingleChoiceAttribute {
+                attribute {
+                  name
+                  slug
+                  externalReference
+                }
+                value {
+                  en: name
+                  slug
+                  fr: translation(languageCode: FR)
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+  const BATCH_SIZE = 100;
+  let allVariants = [];
+  let hasNextPage = true;
+  let endCursor = null;
+
+  while (hasNextPage) {
+    const variables = {
+      first: BATCH_SIZE,
+      after: endCursor,
+    };
+
+    const data = await executeGraphQL(query, { variables });
+
+    const variants = data.productVariants.edges.map((edge) => edge.node);
+    allVariants = allVariants.concat(variants);
+
+    hasNextPage = data.productVariants.pageInfo.hasNextPage;
+    endCursor = data.productVariants.pageInfo.endCursor;
+  }
+
+  const mutation = `
+      mutation TranslateProductVariant($id: ID!, $input: NameTranslationInput!, $languageCode: LanguageCodeEnum!) {
+            productVariantTranslate(id: $id, input: $input, languageCode: $languageCode) {
+              errors {
+                field
+                message
+                code
+              }
+              productVariant {
+                id
+                name
+              }
+            }
+          }
+        `;
+
+  for (const variant of allVariants) {
+    if (!variant.fr) {
+      // Create translation
+      const colorAttr = variant.assignedAttributes.find(
+        (attr) => attr.attribute.slug === 'color'
+      );
+      const colorName = colorAttr ? colorAttr.value.fr : null;
+      const sizeAttr = variant.assignedAttributes.find(
+        (attr) => attr.attribute.slug === 'size'
+      );
+      const sizeName = sizeAttr ? sizeAttr.value.fr : null;
+
+      const variablesTr = {
+        id: variant.id,
+        input: { name: `${colorName} - ${sizeName}` },
+        languageCode: 'FR',
+      };
+
+      const resultTr = await executeGraphQL(mutation, {
+        variables: variablesTr,
+      });
+    }
+  }
+  console.log(
+    `Created missing variant translations for ${allVariants.length} variants.`
+  );
 }
 
 function lookupCategory(og) {
