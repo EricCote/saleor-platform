@@ -1,6 +1,6 @@
 services:
   api:
-    image: ghcr.io/saleor/saleor:3.22
+    image: ghcr.io/saleor/saleor:3.22.0
     ports:
       - 8000:8000
     restart: unless-stopped
@@ -89,7 +89,7 @@ services:
     # volumes: []
 
   dashboard:
-    image: ghcr.io/saleor/saleor-dashboard:3.22
+    image: ghcr.io/saleor/saleor-dashboard:latest
     ports:
       - 9000:80
     restart: unless-stopped
@@ -131,7 +131,7 @@ services:
   #Scheduler:  https://docs.saleor.io/developer/running-saleor/task-queue
   #command: celery -A saleor -B
   worker:
-    image: ghcr.io/saleor/saleor:3.22
+    image: ghcr.io/saleor/saleor:3.22.0
     command: celery --app=saleor.celeryconf:app worker --beat --scheduler=saleor.schedulers.schedulers.DatabaseScheduler -E --loglevel=info
     # command: celery --app=saleor.celeryconf:app worker  -E --loglevel=info
     restart: unless-stopped
