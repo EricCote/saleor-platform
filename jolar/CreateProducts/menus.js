@@ -57,7 +57,11 @@ const transMutation = `
 
 const cats = (await fetchCategoryTree()).filter((cat) => cat.jolar);
 
-const collections = (await fetchAllCollections()).filter((coll) => coll.jolar);
+const collections = (await fetchAllCollections()).filter(
+  (coll) =>
+    coll.jolar &&
+    coll.metadata.find((m) => m.key == 'type' && m.value == 'supplier')
+);
 
 //check existing menus
 let menuId = await fetchMenuId('navbar');

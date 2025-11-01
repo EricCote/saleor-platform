@@ -20,20 +20,27 @@ const level2 = [
 ];
 
 const fournisseurs = [
-  { fr: 'Dreamgirl', en: 'DreamGirl', og: 'Dg Brands' },
-  { fr: 'Music Legs', en: 'Music Legs', og: 'Music Legs' },
-  { fr: 'Grupo Espiral', en: 'Grupo Espiral', og: 'Grupo Espiral' },
+  { fr: 'Dreamgirl', en: 'DreamGirl', og: 'Dg Brands', type: 'supplier' },
+  { fr: 'Music Legs', en: 'Music Legs', og: 'Music Legs', type: 'supplier' },
+  {
+    fr: 'Grupo Espiral',
+    en: 'Grupo Espiral',
+    og: 'Grupo Espiral',
+    type: 'supplier',
+  },
   {
     fr: 'Fantasy Lingerie',
     en: 'Fantasy Lingerie',
     og: 'Fantasy Lingerie',
+    type: 'supplier',
   },
 
-  { fr: 'Magic Silk', en: 'Magic Silk', og: 'Magic Silk' },
-  { fr: 'Male Power', en: 'Male Power', og: 'Male Power' },
+  { fr: 'Magic Silk', en: 'Magic Silk', og: 'Magic Silk', type: 'supplier' },
+  { fr: 'Male Power', en: 'Male Power', og: 'Male Power', type: 'supplier' },
 
-  { fr: '665 Leather', en: '665 Leather', og: '665 Leather' },
-  { fr: 'Taboo', en: 'Taboo', og: 'Taboo' },
+  { fr: '665 Leather', en: '665 Leather', og: '665 Leather', type: 'supplier' },
+  { fr: 'Taboo', en: 'Taboo', og: 'Taboo', type: 'supplier' },
+  { fr: 'Non-Validé', en: 'Unvalidated', og: 'Unvalidated', type: 'hidden' },
 ];
 
 const level3 = [
@@ -213,7 +220,7 @@ async function createCollections(collections) {
   const channelID = await fetchChannel('default-channel');
 
   for (const collection of collections) {
-    const { en: nameEn, fr: nameFr, og: og } = collection;
+    const { en: nameEn, fr: nameFr, og: og, type: type } = collection;
 
     const queryCol = `
       mutation CreateCollection($input: CollectionCreateInput!) {
@@ -253,7 +260,7 @@ async function createCollections(collections) {
         description: `{"blocks": [{"data": {"text": "Description for ${nameEn}."}, "type": "paragraph"}]}`,
         seo: { title: `${nameEn} Collection` },
         privateMetadata: [{ key: 'jolar', value: og }],
-        metadata: [{ key: 'type', value: 'supplier' }],
+        metadata: [{ key: 'type', value: type }],
       },
     };
 

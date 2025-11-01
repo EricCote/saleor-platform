@@ -1,5 +1,4 @@
 import { executeGraphQL } from '../../CreateProducts/graphql.js';
-import slug from 'slug';
 
 import 'dotenv/config';
 import {

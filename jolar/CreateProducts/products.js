@@ -359,7 +359,7 @@ async function createProducts(products) {
       ],
       variants: p.variants.map((v) => ({
         attributes: [
-          { externalReference: 'size', plainText: v.Size },
+          { externalReference: 'size', dropdown: { value: v.Size } },
           { externalReference: 'color', dropdown: { value: v.Color } },
         ],
         sku: v.UPC ?? v.EAN ?? v.Product + v.Size + v.Color,
@@ -384,7 +384,7 @@ async function createProducts(products) {
   );
   const listProducts = await Promise.all(promises);
 
-  const listTranslations = prods.map((p) => {
+  const translationList = prods.map((p) => {
     const prodNames = lookupName(p.Product);
     return {
       //id: 'asdf',
@@ -392,12 +392,12 @@ async function createProducts(products) {
       languageCode: 'FR',
       translationFields: {
         name: prodNames.fr,
-        description: `{"blocks": [{"data": {"text": "Decription pour ${prodNames.fr.replace(
+        description: `{"blocks": [{"data": {"text": "Description pour ${prodNames.fr.replace(
           /"/g,
           '\\"'
         )}."}, "type": "paragraph"}]}`,
         seoTitle: prodNames.fr,
-        //seoDescription: '',
+        seoDescription: `Description pour ${prodNames.fr}.`,
       },
     };
   });
@@ -438,7 +438,7 @@ async function createProducts(products) {
   while (pos < maxPos) {
     const batch = listProducts.slice(pos, pos + 10);
     variables.products = batch;
-    const batchTr = listTranslations.slice(pos, pos + 10);
+    const batchTr = translationList.slice(pos, pos + 10);
 
     try {
       //console.log(variables.products[0]);
@@ -446,7 +446,7 @@ async function createProducts(products) {
       pos += batch.length;
       fs.writeFileSync('./currentProductPos.txt', pos.toString(), 'utf8');
       console.log(`products created successfully up to : `, pos);
-      createTranslations(batchTr);
+      createProductTranslations(batchTr);
     } catch (error) {
       console.error(`Error creating products: %o`, error);
       console.log(`Retrying from ${pos}`); // Stop on error to avoid overwhelming the server
@@ -455,7 +455,43 @@ async function createProducts(products) {
   }
 }
 
-async function createTranslations(translations) {
+async function createProductTranslations(translations) {
+  const query = `
+      mutation TranslateBulkProduct($errorPolicy: ErrorPolicyEnum, $translations: [ProductBulkTranslateInput!]!) {
+        productBulkTranslate(errorPolicy: $errorPolicy, translations: $translations) {
+          errors {
+            path
+            message
+          }
+          results { 
+            translation{
+              id
+              language{
+               code
+              }
+              name
+              description
+            }
+          }
+          count
+        }
+      }
+    `;
+  const variables = {
+    errorPolicy: 'REJECT_EVERYTHING',
+    translations: translations,
+  };
+
+  try {
+    const response = await executeGraphQL(query, { variables });
+    console.log(`translation created successfully`);
+  } catch (error) {
+    console.error(`Error creating products: %o`, error);
+    throw error;
+  }
+}
+
+async function createVariantTranslations(translations) {
   const query = `
       mutation TranslateBulkProduct($errorPolicy: ErrorPolicyEnum, $translations: [ProductBulkTranslateInput!]!) {
         productBulkTranslate(errorPolicy: $errorPolicy, translations: $translations) {

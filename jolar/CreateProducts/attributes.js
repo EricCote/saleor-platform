@@ -4,6 +4,28 @@ import { GetDataFromFile } from './excel.js';
 
 const jsonRef = GetDataFromFile('./dataRef.xlsx');
 
+const sizeList = [
+  { id: 's001', fr: 'Taille Unique', en: 'O/S', len: 100 },
+  { id: 's002', fr: 'XS', en: 'XS', len: 100 },
+  { id: 's003', fr: 'S', en: 'S', len: 100 },
+  { id: 's004', fr: 'M', en: 'M', len: 100 },
+  { id: 's005', fr: 'L', en: 'L', len: 100 },
+  { id: 's006', fr: 'XL', en: 'XL', len: 100 },
+  { id: 's007', fr: 'XXL', en: 'XXL', len: 100 },
+  { id: 's008', fr: '1X', en: '1X', len: 100 },
+  { id: 's009', fr: '2X', en: '2X', len: 100 },
+  { id: 's010', fr: '3X', en: '3X', len: 100 },
+  { id: 's011', fr: 'QUEEN', en: 'QUEEN', len: 100 },
+  { id: 's012', fr: 'S/M', en: 'S/M', len: 100 },
+  { id: 's013', fr: 'M/L', en: 'M/L', len: 100 },
+  { id: 's014', fr: 'L/XL', en: 'L/XL', len: 100 },
+  { id: 's015', fr: 'SM', en: 'SM', len: 100 },
+  { id: 's016', fr: 'ML', en: 'ML', len: 100 },
+  { id: 's017', fr: '1X/2X', en: '1X/2X', len: 100 },
+  { id: 's018', fr: '2X/3X', en: '2X/3X', len: 100 },
+  { id: 's019', fr: '3X/4X', en: '3X/4X', len: 100 },
+];
+
 const metaMutation = `
     mutation UpdatePrivateMetadata($id: ID!, $input: [MetadataInput!]!) {
       updatePrivateMetadata(id: $id, input: $input) {
@@ -91,8 +113,9 @@ async function createAttributes() {
       slug: 'size',
       externalReference: 'size',
       type: 'PRODUCT_TYPE',
-      inputType: 'PLAIN_TEXT', // or "TEXT", "BOOLEAN", etc.
+      inputType: 'DROPDOWN', // or "TEXT", "BOOLEAN", etc.
       isVariantOnly: true,
+      values: sizeList.map((s) => ({ name: s.en, externalReference: s.id })),
     },
   };
   const color = {
@@ -131,11 +154,6 @@ async function createAttributes() {
       input: { name: frName },
       languageCode: 'FR',
     };
-
-    //if color
-    if (frName == 'Couleur') {
-      addFrenchColors(result.attributeCreate.attribute.id);
-    }
 
     const transResult = await executeGraphQL(transMutation, {
       variables: transVar,
@@ -218,11 +236,16 @@ async function createProductType(name, slug, attributeList, variantList) {
   await executeGraphQL(mutation2, { variables: variables2 });
 }
 
-async function addFrenchColors() {
+async function translateAttributes() {
   const colors = colorList.map((c) => ({
     externalReference: c.id,
     languageCode: 'FR',
     translationFields: { name: c.fr },
+  }));
+  const sizes = sizeList.map((s) => ({
+    externalReference: s.id,
+    languageCode: 'FR',
+    translationFields: { name: s.fr },
   }));
   const mutation = `
     mutation BulkTranslateAttributeValue($errorPolicy: ErrorPolicyEnum, $translations: [AttributeValueBulkTranslateInput!]!){
@@ -237,7 +260,10 @@ async function addFrenchColors() {
     }
   `;
 
-  const variables = { errorPolicy: 'REJECT_EVERYTHING', translations: colors };
+  const variables = {
+    errorPolicy: 'REJECT_EVERYTHING',
+    translations: [...colors, ...sizes],
+  };
 
   const result = await executeGraphQL(mutation, {
     variables,
@@ -254,4 +280,4 @@ createProductType(
   res.variantAttributes
 );
 
-addFrenchColors();
+await translateAttributes();

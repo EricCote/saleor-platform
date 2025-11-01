@@ -15,3 +15,10 @@ On roule les scripts dans l'ordre:
 `featured.js`: importe les "featured products" pour la page d'accueil (20 dernières nouveautés)
 `syncStocks.js`: Synchronise les stocks. Génère des produits ou variantes s'il le faut
 `generateProductNames.js`: : génère le fichier productNames.json
+
+To delete in the right order:
+
+`deleteProducts.js`
+`deleteMenus`
+`deleteCategories`
+`deleteAttributes`
