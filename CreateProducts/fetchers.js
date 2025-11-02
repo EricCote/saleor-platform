@@ -262,6 +262,7 @@ export async function fetchAllCollections() {
           node {
             id
             name
+            slug
             nopId: privateMetafield(key: "nopId")
             jolar: privateMetafield(key: "jolar")
             type:  metafield(key: "type")

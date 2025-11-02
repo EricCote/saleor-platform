@@ -1,6 +1,7 @@
 import { executeGraphQL } from '../../CreateProducts/graphql.js';
 import 'dotenv/config';
 import { fetchMenuItems } from '../../CreateProducts/fetchers.js';
+
 const menus = (await fetchMenuItems()).filter((m) => m.jolar);
 
 const response = await deleteMenuItems(menus);

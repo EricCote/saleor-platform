@@ -4,6 +4,7 @@ import 'dotenv/config';
 import {
   fetchChannel,
   updateCollectionChannelListing,
+  fetchAllCollections,
 } from '../../CreateProducts/fetchers.js';
 
 export async function listProductsWithVariants() {
@@ -37,6 +38,7 @@ query ProductsWithMostVariants($after: String) {
     };
 
     const res = await executeGraphQL(query, { variables });
+
     const products = res.products.edges.map((n) => ({
       id: n.node.id,
       name: n.node.name,
@@ -68,7 +70,6 @@ async function createCollection(prods) {
           field
           message
           code
-
         }
       }
     }
@@ -97,6 +98,7 @@ async function createCollection(prods) {
         '{"blocks":[{"data":{"text":"Featured Products Collection"},"type":"paragraph"}]}',
       seo: {
         title: 'Featured Products',
+        description: 'Collection of featured products.',
       },
       isPublished: true,
       products: prods,
@@ -104,6 +106,9 @@ async function createCollection(prods) {
   };
 
   const res = await executeGraphQL(query, { variables });
+
+  console.log('Created collection Featured Products');
+  console.dir(res, { depth: null });
 
   const collectionId = res.collectionCreate.collection.id;
 
@@ -113,6 +118,7 @@ async function createCollection(prods) {
       name: 'En Vedette',
       seoTitle: `Collection de produits en vedette`,
       description: `{"blocks": [{"data": {"text": "Description pour les poduits en vedette."}, "type": "paragraph"}]}`,
+      seoDescription: `Description pour les poduits en vedette.`,
     },
     languageCode: 'FR',
   };
@@ -129,6 +135,38 @@ async function createCollection(prods) {
   return { res, resTr, resCh };
 }
 
+async function deleteFeaturedCollection() {
+  const allCollections = await fetchAllCollections();
+  const featuredCollection = allCollections.find(
+    (col) => col.slug === 'featured-products'
+  );
+  if (featuredCollection) {
+    const deleteQuery = `
+      mutation DeleteCollection($id: ID!) {
+        collectionDelete(id: $id) {
+          collection {
+            id
+          }
+          errors {
+            field
+            message
+            code
+          }
+        }   
+      }
+    `;
+
+    const variables = {
+      id: featuredCollection.id,
+    };
+    const res = await executeGraphQL(deleteQuery, { variables });
+    console.log('Deleted collection Featured Products: ');
+    console.dir(res, { depth: null });
+  }
+}
+
 //console.dir(prods, { depth: null });
+
+await deleteFeaturedCollection();
 const prods = (await listProductsWithVariants()).map((p) => p.id);
 await createCollection(prods);

@@ -5,7 +5,8 @@ dump.sql
 
 /.pnp
 .pnp.js
-/secrets
+/secrets/
+/backups/
 # next.js
 /.next/
 /out/
