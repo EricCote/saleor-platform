@@ -1,3 +1,7 @@
+// This file reads product data from an Excel file, performs various filters and groupings,
+// and outputs statistics about the products based on different criteria. It also cross-references
+// product data with a reference Excel file to enrich the information.
+
 import util from 'util';
 import { GetDataFromFile } from './excel.js';
 
