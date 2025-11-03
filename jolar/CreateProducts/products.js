@@ -20,7 +20,7 @@ const productMax = null;
 const namesMap = fs.readFileSync('productNames.json', 'utf-8');
 const mapping = JSON.parse(namesMap);
 
-const jsonData = GetDataFromFile('./data2.xlsx');
+const jsonData = GetDataFromFile('./localHistory/data2.xlsx');
 
 // the main list keeps products that have more than 20 items, have a price and are not discontinued
 

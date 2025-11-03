@@ -97,7 +97,7 @@ services:
       API_URL: ${API_URL}
 
   db:
-    image: library/postgres:alpine
+    image: library/postgres:17-alpine
     ports:
       - 5432:5432
     restart: unless-stopped
