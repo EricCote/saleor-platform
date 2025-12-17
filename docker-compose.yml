@@ -9,7 +9,7 @@ services:
     stdin_open: true
     tty: true
     depends_on:
-      redis:
+      cache:
         condition: service_started
       jaeger:
         condition: service_started
@@ -118,15 +118,15 @@ services:
       timeout: 5s
       retries: 5
 
-  redis:
-    image: library/redis:alpine
+  cache:
+    image: valkey/valkey:8-alpine
     ports:
       - 6379:6379
     restart: unless-stopped
     networks:
       - saleor-backend-tier
     volumes:
-      - saleor-redis:/data
+      - saleor-cache:/data
 
   #Scheduler:  https://docs.saleor.io/developer/running-saleor/task-queue
   #command: celery -A saleor -B
@@ -141,7 +141,7 @@ services:
       - common.env
       - backend.env
     depends_on:
-      - redis
+      - cache
       - mailpit
     volumes:
       # shared volume between worker and api for media
@@ -152,9 +152,10 @@ services:
     profiles:
       - dev
     depends_on:
-      - redis
+      - cache
     environment:
-      - CELERY_BROKER_URL=redis://redis:6379/1
+      # - CELERY_BROKER_URL=redis://cache:6379/2 
+      - CELERY_BROKER_URL=redis://cache:6379/1
       - FLOWER_UNAUTHENTICATED_API=true
     networks:
       - saleor-backend-tier
@@ -208,7 +209,7 @@ services:
 volumes:
   saleor-db:
     driver: local
-  saleor-redis:
+  saleor-cache:
     driver: local
   saleor-media:
   node_modules_store:

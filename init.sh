@@ -2,16 +2,20 @@
 
 docker compose pull
 docker compose run --rm api python3 manage.py migrate
+docker compose run --rm api python3 manage.py collectstatic --noinput
 #docker compose run --rm api python3 manage.py populatedb
+
+# Create superuser without prompt.
+# uses DJANGO_SUPERUSER_EMAIL and DJANGO_SUPERUSER_PASSWORD from backend.env
 docker compose run --rm api python3 manage.py createsuperuser --no-input
 
 #Only dev Mode
-#docker compose up api -d
+#docker compose up -d api
 #docker compose build storefront
 #docker compose run --rm storefront sh -c "HUSKY=0 COREPACK_ENABLE_DOWNLOAD_PROMPT=0 pnpm install"
 #docker compose down 
 
-docker compose up api -d
+docker compose up -d api
 docker compose build --no-cache storefront_prod
 
 docker compose up -d
